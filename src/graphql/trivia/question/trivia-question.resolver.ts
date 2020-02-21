@@ -94,9 +94,9 @@ export class TriviaQuestionResolver {
 
     for (const question of questions) {
       question.verified = true
-
-      await getManager().save(question)
     }
+
+    await getManager().save(questions)
 
     return new CountResult(questions.length)
   }
@@ -110,9 +110,9 @@ export class TriviaQuestionResolver {
 
     for (const question of questions) {
       question.disabled = true
-
-      await getManager().save(question)
     }
+
+    await getManager().save(questions)
 
     return new CountResult(questions.length)
   }
@@ -128,9 +128,9 @@ export class TriviaQuestionResolver {
 
     for (const question of questions) {
       question.category = category
-
-      await getManager().save(question)
     }
+
+    await getManager().save(questions)
 
     return new CountResult(questions.length)
   }
