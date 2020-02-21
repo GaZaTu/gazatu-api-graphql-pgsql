@@ -21,6 +21,7 @@ import { TriviaCategory } from './graphql/trivia/category/trivia-category.type'
 import { TriviaQuestionLegacyInput } from './graphql/trivia/question/trivia-question.legacy.input'
 import { Language } from './graphql/meta/language/language.type'
 import './graphql/dataloader-typeorm'
+import { readFileSync } from 'fs'
 
 function koaGraphQLlMiddleware(schema: gql.GraphQLSchema, contextValue?: (ctx: Koa.Context) => unknown): Koa.Middleware {
   return async (ctx, next) => {
@@ -238,7 +239,13 @@ export class App {
 
     await new Promise<void>(resolve => {
       if (config.has('httpsConfig')) {
-        const httpsConfig = Object.assign({}, config.get('httpsConfig'), { allowHTTP1: true })
+        const httpsConfig = Object.assign({}, config.get('httpsConfig') as any, { allowHTTP1: true })
+
+        Object.assign(httpsConfig, {
+          keyPath: readFileSync(httpsConfig.keyPath),
+          certPath: readFileSync(httpsConfig.certPath),
+          caPath: readFileSync(httpsConfig.caPath),
+        })
 
         this.server = http2.createSecureServer(httpsConfig, this.koa.callback())
       } else {

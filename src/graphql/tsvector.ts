@@ -78,6 +78,6 @@ export const TSVectorColumn = (): PropertyDecorator => {
         BEFORE INSERT OR UPDATE ON "${tableName}" FOR EACH ROW
         EXECUTE PROCEDURE "${triggerFunctionName}"()
       `)
-    }, 1000)
+    }, 10000)
   }
 }
