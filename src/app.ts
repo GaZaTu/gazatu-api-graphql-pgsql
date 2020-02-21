@@ -239,13 +239,13 @@ export class App {
 
     await new Promise<void>(resolve => {
       if (config.has('httpsConfig')) {
-        const httpsConfig = Object.assign({}, config.get('httpsConfig') as any, { allowHTTP1: true })
-
-        Object.assign(httpsConfig, {
-          keyPath: readFileSync(httpsConfig.keyPath),
-          certPath: readFileSync(httpsConfig.certPath),
-          caPath: readFileSync(httpsConfig.caPath),
-        })
+        const httpsConfigSource = config.get('httpsConfig') as any
+        const httpsConfig = {
+          allowHTTP1: true,
+          key: readFileSync(httpsConfigSource.keyPath),
+          cert: readFileSync(httpsConfigSource.certPath),
+          ca: [readFileSync(httpsConfigSource.caPath)],
+        }
 
         this.server = http2.createSecureServer(httpsConfig, this.koa.callback())
       } else {
