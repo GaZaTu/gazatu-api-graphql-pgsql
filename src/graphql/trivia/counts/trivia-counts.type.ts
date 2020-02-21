@@ -23,4 +23,7 @@ export class TriviaCounts {
 
   @Field()
   reportedQuestionsCount!: number
+
+  @Field()
+  danglingQuestionsCount!: number
 }

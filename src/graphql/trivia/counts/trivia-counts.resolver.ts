@@ -6,7 +6,7 @@ import { TriviaQuestion } from '../question/trivia-question.type'
 import { TriviaReport } from '../report/trivia-report.type'
 import { TriviaCategory } from '../category/trivia-category.type'
 
-const countQuestions = ({ verified, reported }: { verified?: boolean, reported?: boolean } = {}) => {
+const countQuestions = ({ verified, reported, dangling }: { verified?: boolean, reported?: boolean, dangling?: boolean } = {}) => {
   let query = getManager()
     .createQueryBuilder()
     .select('count(*) AS count')
@@ -23,12 +23,17 @@ const countQuestions = ({ verified, reported }: { verified?: boolean, reported?:
       .andWhere(`${reported ? 'EXISTS' : 'NOT EXISTS'} ${query.subQuery().select('1').from(TriviaReport, 'report').where('report."questionId" = question."id"').getQuery()}`)
   }
 
+  if (dangling !== undefined) {
+    query = query
+      .andWhere(`${query.subQuery().select('(NOT category."verified") OR (category."disabled")').from(TriviaCategory, 'category').where('question."categoryId" = category."id"').getQuery()} = :dangling`, { dangling })
+  }
+
   return query.getRawOne()
     .then(r => r.count as number)
 }
 
 const countUnverifiedQuestions = () =>
-  countQuestions({ verified: false })
+  countQuestions({ verified: false, dangling: false })
 
 const countCategories = ({ verified }: { verified?: boolean } = {}) => {
   let query = getManager()
@@ -63,6 +68,9 @@ const countReports = () => {
 const countReportedQuestions = () =>
   countQuestions({ reported: true })
 
+const countDanglingQuestions = () =>
+  countQuestions({ dangling: true })
+
 @Resolver(type => TriviaCounts)
 export class TriviaCountsResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
@@ -75,6 +83,7 @@ export class TriviaCountsResolver {
       unverifiedCategoriesCount,
       reportsCount,
       reportedQuestionsCount,
+      danglingQuestionsCount,
     ] = await Promise.all([
       countQuestions(),
       countUnverifiedQuestions(),
@@ -82,6 +91,7 @@ export class TriviaCountsResolver {
       countUnverifiedCategories(),
       countReports(),
       countReportedQuestions(),
+      countDanglingQuestions(),
     ])
 
     return new TriviaCounts({
@@ -91,6 +101,7 @@ export class TriviaCountsResolver {
       unverifiedCategoriesCount,
       reportsCount,
       reportedQuestionsCount,
+      danglingQuestionsCount,
     })
   }
 }

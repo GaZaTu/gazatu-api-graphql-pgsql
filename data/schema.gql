@@ -92,7 +92,7 @@ type Query {
   userRoles: [UserRole!]!
   authenticate(password: String!, username: String!): AuthResult!
   triviaQuestion(id: ID!): TriviaQuestion
-  triviaQuestions(reported: Boolean, disabled: Boolean, verified: Boolean, search: String, sortField: String, sortDirection: SortDirection = ASC, before: String, after: String, first: Int, last: Int): TriviaQuestionConnection!
+  triviaQuestions(dangling: Boolean, reported: Boolean, disabled: Boolean, verified: Boolean, search: String, sortField: String, sortDirection: SortDirection = ASC, before: String, after: String, first: Int, last: Int): TriviaQuestionConnection!
   triviaCategory(id: ID!): TriviaCategory
   triviaCategories(disabled: Boolean, verified: Boolean): [TriviaCategory!]!
   triviaReport(id: ID!): TriviaReport
@@ -135,6 +135,7 @@ type TriviaCounts {
   unverifiedCategoriesCount: Float!
   reportsCount: Float!
   reportedQuestionsCount: Float!
+  danglingQuestionsCount: Float!
 }
 
 type TriviaQuestion implements Node {

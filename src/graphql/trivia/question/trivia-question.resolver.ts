@@ -34,6 +34,7 @@ export class TriviaQuestionResolver {
     @Arg('verified', type => Boolean, { nullable: true }) verified?: boolean,
     @Arg('disabled', type => Boolean, { nullable: true }) disabled = false,
     @Arg('reported', type => Boolean, { nullable: true }) reported?: boolean,
+    @Arg('dangling', type => Boolean, { nullable: true }) dangling?: boolean,
   ) {
     return selectConnection(TriviaQuestion, connectionArgs, searchAndSortArgs, 'question', query => {
       if (verified !== undefined) {
@@ -51,6 +52,11 @@ export class TriviaQuestionResolver {
 
         query = query
           .andWhere(`${reported ? 'EXISTS' : 'NOT EXISTS'} ${query.subQuery().select('1').from(TriviaReport, 'report').where('report."questionId" = question."id"').getQuery()}`)
+      }
+
+      if (dangling !== undefined) {
+        query = query
+          .andWhere(`${query.subQuery().select('(NOT category."verified") OR (category."disabled")').from(TriviaCategory, 'category').where('question."categoryId" = category."id"').getQuery()} = :dangling`, { dangling })
       }
 
       return query
