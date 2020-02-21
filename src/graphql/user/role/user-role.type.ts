@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, BeforeInsert, getManager } from 'typeorm'
+import { Entity, Column, PrimaryColumn, BeforeInsert, getManager, Equal } from 'typeorm'
 import { ObjectType, Field, ID } from 'type-graphql'
 import { Node } from '../../node/node.interface'
 import * as uuid from 'uuid'
@@ -38,10 +38,10 @@ export enum UserRoles {
 
 setTimeout(async () => {
   for (const name of Object.values(UserRoles)) {
-    const existingRole = await getManager().findOne(UserRole, { name })
+    const existingRole = await getManager().findOne(UserRole, { name: Equal(name) })
 
     if (!existingRole) {
       await getManager().save(new UserRole({ name }))
     }
   }
-}, 1000)
+}, 10000)

@@ -52,6 +52,7 @@ export interface Mutation {
     saveTriviaCategory?: TriviaCategory;
     verifyTriviaCategories?: CountResult;
     removeTriviaCategories?: CountResult;
+    mergeTriviaCategoriesInto?: CountResult;
     reportTriviaQuestion?: TriviaReport;
 }
 export interface NodeRef {

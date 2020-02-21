@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Arg, Authorized, ID } from 'type-graphql'
-import { getManager } from 'typeorm'
+import { getManager, Equal } from 'typeorm'
 import { UserRole, UserRoles } from './user-role.type'
 import { UserRoleInput } from './user-role.input'
 
@@ -24,7 +24,7 @@ export class UserRoleResolver {
   async getOrAddUserRole(
     @Arg('input') input: UserRoleInput,
   ) {
-    const role = await getManager().findOne(UserRole, { name: input.name })
+    const role = await getManager().findOne(UserRole, { name: Equal(input.name) })
 
     if (role) {
       return role

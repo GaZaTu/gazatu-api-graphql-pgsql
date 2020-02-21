@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Arg, ID, Query, Ctx, Authorized, FieldResolver, Root } from 'type-graphql'
-import { getManager, In, getRepository } from 'typeorm'
+import { getManager, In, getRepository, Equal } from 'typeorm'
 import { TriviaCategory } from './trivia-category.type'
 import { TriviaCategoryInput } from './trivia-category.input'
 import { assertUserAuthorization } from '../../check-authorization'
@@ -69,9 +69,9 @@ export class TriviaCategoryResolver {
 
     for (const category of categories) {
       category.verified = true
-
-      await getManager().save(category)
     }
+
+    await getManager().save(categories)
 
     return new CountResult(categories.length)
   }
@@ -85,9 +85,33 @@ export class TriviaCategoryResolver {
 
     for (const category of categories) {
       category.disabled = true
-
-      await getManager().save(category)
     }
+
+    await getManager().save(categories)
+
+    return new CountResult(categories.length)
+  }
+
+  @Authorized(UserRoles.TRIVIA_ADMIN)
+  @Mutation(returns => CountResult, { complexity: 5 })
+  async mergeTriviaCategoriesInto(
+    @Arg('ids', type => [String]) ids: string[],
+    @Arg('targetId', type => String) targetId: string,
+  ) {
+    const targetCategory = await getManager().findOneOrFail(TriviaCategory, targetId)
+    const categories = await getManager().find(TriviaCategory, { id: In(ids) })
+
+    for (const category of categories) {
+      const questions = await getManager().find(TriviaQuestion, { category: Equal(category) })
+
+      for (const question of questions) {
+        question.category = targetCategory
+      }
+
+      await getManager().save(questions)
+    }
+
+    await getManager().remove(categories)
 
     return new CountResult(categories.length)
   }
@@ -98,7 +122,7 @@ export class TriviaCategoryResolver {
     @Root() category: TriviaCategory,
   ) {
     return getManager().find(TriviaQuestion, {
-      where: { category },
+      where: { category: Equal(category) },
     })
   }
 }

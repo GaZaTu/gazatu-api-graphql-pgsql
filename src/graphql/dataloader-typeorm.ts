@@ -1,8 +1,8 @@
-import { EntityManager, ObjectType, EntitySchema, ObjectID, FindConditions, FindOneOptions, getMetadataArgsStorage, In } from 'typeorm'
+import { EntityManager, ObjectType, EntitySchema, ObjectID, FindOptions, FindOptionsWhere, getMetadataArgsStorage, In } from 'typeorm'
 import * as Dataloader from 'dataloader'
 
 type EntityClass<Entity> = ObjectType<Entity> | EntitySchema<Entity> | string
-type IDOrConditionsOrOptions<Entity> = string | number | Date | ObjectID | FindConditions<Entity> | FindOneOptions<Entity>
+type IDOrConditionsOrOptions<Entity> = string | number | Date | ObjectID | FindOptionsWhere<Entity> | FindOptions<Entity>
 
 const registeredDataloaders = new Map<EntityClass<any>, Dataloader<string, any>>()
 
@@ -42,7 +42,7 @@ const findOneWithDataloader = <Entity>(manager: EntityManager, Type: Function, i
 EntityManager.prototype.findOne = function <Entity>(
   entityClass: EntityClass<Entity>,
   idOrConditionsOrOptions?: IDOrConditionsOrOptions<Entity>,
-  options?: FindOneOptions<Entity>,
+  options?: FindOptions<Entity>,
 ) {
   if (typeof idOrConditionsOrOptions === 'string') {
     return findOneWithDataloader(this, entityClass as Function, idOrConditionsOrOptions)

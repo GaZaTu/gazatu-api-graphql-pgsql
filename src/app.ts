@@ -9,7 +9,7 @@ import * as config from 'config'
 import * as gql from 'graphql'
 import 'reflect-metadata'
 import buildGraphQLSchema from './graphql'
-import { Connection, createConnection, getManager, getRepository } from 'typeorm'
+import { Connection, createConnection, getManager, getRepository, Equal } from 'typeorm'
 // import { getComplexity, fieldExtensionsEstimator, simpleEstimator } from 'graphql-query-complexity'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { Context } from './graphql/context'
@@ -119,7 +119,7 @@ export class App {
 
   async listen({ useLogger } = { useLogger: false }) {
     this.koa = App.setupKoa({ useLogger })
-    this.typeormConnection = await createConnection(config.get('database'))
+    this.typeormConnection = await createConnection(Object.assign({}, config.get('database') as any))
 
     if (!App.gqlSchema) {
       App.gqlSchema = await buildGraphQLSchema()
@@ -133,7 +133,7 @@ export class App {
 
           if (parsedToken && typeof parsedToken === 'object') {
             return getManager().findOne(User, {
-              where: { id: parsedToken.id },
+              where: { id: Equal(parsedToken.id) },
               relations: ['roles'],
             })
           }
@@ -238,9 +238,9 @@ export class App {
 
     await new Promise<void>(resolve => {
       if (config.has('httpsConfig')) {
-        Object.assign(config.get('httpsConfig'), { allowHTTP1: true })
+        const httpsConfig = Object.assign({}, config.get('httpsConfig'), { allowHTTP1: true })
 
-        this.server = http2.createSecureServer(config.get('httpsConfig'), this.koa.callback())
+        this.server = http2.createSecureServer(httpsConfig, this.koa.callback())
       } else {
         this.server = http.createServer(this.koa.callback())
       }

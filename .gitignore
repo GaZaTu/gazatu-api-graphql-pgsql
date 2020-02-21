@@ -3,3 +3,4 @@ dist/
 pgsql/
 coverage/
 config/
+ormconfig.json

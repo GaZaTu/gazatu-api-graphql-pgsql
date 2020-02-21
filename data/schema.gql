@@ -62,6 +62,7 @@ type Mutation {
   saveTriviaCategory(input: TriviaCategoryInput!): TriviaCategory!
   verifyTriviaCategories(ids: [String!]!): CountResult!
   removeTriviaCategories(ids: [String!]!): CountResult!
+  mergeTriviaCategoriesInto(targetId: String!, ids: [String!]!): CountResult!
   reportTriviaQuestion(input: TriviaReportInput!): TriviaReport!
 }
 

@@ -36,7 +36,7 @@
     "subscriptions-transport-ws": "^0.9.16",
     "type-graphql": "^0.17.6",
     "typedi": "^0.8.0",
-    "typeorm": "^0.2.22",
+    "typeorm": "^0.3.0-rc.17",
     "uuid": "^3.4.0",
     "ws": "^7.2.1"
   },
