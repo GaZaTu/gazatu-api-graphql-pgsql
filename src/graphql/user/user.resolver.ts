@@ -76,10 +76,14 @@ export class UserResolver {
   async roles(
     @Root() user: User,
   ) {
-    return getManager().find(UserRole, {
-      where: {
-        id: In(user.roleIds ?? []),
-      },
-    })
+    if (user.roleIds?.length) {
+      return getManager().find(UserRole, {
+        where: {
+          id: In(user.roleIds ?? []),
+        },
+      })
+    } else {
+      return []
+    }
   }
 }
