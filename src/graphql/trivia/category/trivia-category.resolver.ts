@@ -102,7 +102,12 @@ export class TriviaCategoryResolver {
     const categories = await getManager().find(TriviaCategory, { id: In(ids) })
 
     for (const category of categories) {
-      const questions = await getManager().find(TriviaQuestion, { category: Equal(category) })
+      // const questions = await getManager().find(TriviaQuestion, { category: Equal(category) })
+
+      const questions = await getRepository(TriviaQuestion)
+        .createQueryBuilder('question')
+        .where('question."categoryId" = :categoryId', { categoryId: category.id })
+        .getMany()
 
       for (const question of questions) {
         question.category = targetCategory
@@ -121,8 +126,12 @@ export class TriviaCategoryResolver {
   async questions(
     @Root() category: TriviaCategory,
   ) {
-    return getManager().find(TriviaQuestion, {
-      where: { category: Equal(category) },
-    })
+    // return getManager().find(TriviaQuestion, {
+    //   where: { category: Equal(category) },
+    // })
+    return getRepository(TriviaQuestion)
+      .createQueryBuilder('question')
+      .where('question."categoryId" = :categoryId', { categoryId: category.id })
+      .getMany()
   }
 }

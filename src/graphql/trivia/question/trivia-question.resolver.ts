@@ -201,8 +201,12 @@ export class TriviaQuestionResolver {
   async reports(
     @Root() question: TriviaQuestion,
   ) {
-    return getManager().find(TriviaReport, {
-      where: { question: Equal(question) },
-    })
+    // return getManager().find(TriviaReport, {
+    //   where: { question: Equal(question) },
+    // })
+    return getRepository(TriviaReport)
+      .createQueryBuilder('report')
+      .where('report."questionId" = :questionId', { questionId: question.id })
+      .getMany()
   }
 }
