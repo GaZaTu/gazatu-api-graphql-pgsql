@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Arg, ID, Query, Args, Authorized, FieldResolver, Root, Ctx } from 'type-graphql'
-import { getManager, In, getRepository } from 'typeorm'
+import { getManager, In, getRepository, Equal } from 'typeorm'
 import { TriviaQuestion } from './trivia-question.type'
 import { TriviaQuestionInput } from './trivia-question.input'
 import { TriviaCategory } from '../category/trivia-category.type'
@@ -144,8 +144,8 @@ export class TriviaQuestionResolver {
       const { category: categoryName, language: languageName, ...questionInput } = legacyQuestion
       const question = new TriviaQuestion(questionInput)
 
-      let category = await getManager().findOne(TriviaCategory, { name: categoryName })
-      let language = await getManager().findOne(Language, { name: 'english' })
+      let category = await getManager().findOne(TriviaCategory, { name: Equal(categoryName) })
+      let language = await getManager().findOne(Language, { name: Equal('english') })
 
       if (!category) {
         category = new TriviaCategory({ name: categoryName })
@@ -202,7 +202,7 @@ export class TriviaQuestionResolver {
     @Root() question: TriviaQuestion,
   ) {
     return getManager().find(TriviaReport, {
-      where: { question },
+      where: { question: Equal(question) },
     })
   }
 }

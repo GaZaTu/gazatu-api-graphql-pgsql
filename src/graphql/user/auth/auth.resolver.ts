@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Arg, Ctx, UnauthorizedError } from 'type-graphql'
-import { getManager } from 'typeorm'
+import { getManager, Equal } from 'typeorm'
 import * as argon2 from 'argon2'
 import * as config from 'config'
 import { signJwt } from '../../jwt'
@@ -58,7 +58,7 @@ export class AuthResolver {
     }
 
     const user = await getManager().findOne(User, {
-      where: { username },
+      where: { username: Equal(username) },
       relations: ['roles'],
     })
 

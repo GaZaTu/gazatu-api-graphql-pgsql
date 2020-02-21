@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Arg, ID, Query, Ctx, Authorized, FieldResolver, Root } from 'type-graphql'
-import { getManager, In, getRepository } from 'typeorm'
+import { getManager, In, getRepository, Equal } from 'typeorm'
 import { TriviaCategory } from './trivia-category.type'
 import { TriviaCategoryInput } from './trivia-category.input'
 import { assertUserAuthorization } from '../../check-authorization'
@@ -102,7 +102,7 @@ export class TriviaCategoryResolver {
     const categories = await getManager().find(TriviaCategory, { id: In(ids) })
 
     for (const category of categories) {
-      const questions = await getManager().find(TriviaQuestion, { category })
+      const questions = await getManager().find(TriviaQuestion, { category: Equal(category) })
 
       for (const question of questions) {
         question.category = targetCategory
@@ -122,7 +122,7 @@ export class TriviaCategoryResolver {
     @Root() category: TriviaCategory,
   ) {
     return getManager().find(TriviaQuestion, {
-      where: { category },
+      where: { category: Equal(category) },
     })
   }
 }
