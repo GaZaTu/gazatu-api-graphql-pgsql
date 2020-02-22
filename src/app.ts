@@ -193,6 +193,11 @@ export class App {
             .andWhere('category."disabled" = :disabled', { disabled: Boolean(ctx.query.disabled) })
         }
 
+        if (ctx.query.submitter !== undefined) {
+          query = query
+            .andWhere('question."submitter" = :submitter', { submitter: ctx.query.submitter })
+        }
+
         if (!Boolean(ctx.query.shuffled)) {
           query = query
             .addOrderBy('question."createdAt"', 'DESC')
