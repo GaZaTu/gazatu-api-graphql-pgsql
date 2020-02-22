@@ -64,6 +64,7 @@ type Mutation {
   removeTriviaCategories(ids: [String!]!): CountResult!
   mergeTriviaCategoriesInto(targetId: String!, ids: [String!]!): CountResult!
   reportTriviaQuestion(input: TriviaReportInput!): TriviaReport!
+  removeTriviaReports(ids: [String!]!): CountResult!
 }
 
 interface Node {

@@ -54,6 +54,7 @@ export interface Mutation {
     removeTriviaCategories?: CountResult;
     mergeTriviaCategoriesInto?: CountResult;
     reportTriviaQuestion?: TriviaReport;
+    removeTriviaReports?: CountResult;
 }
 export interface NodeRef {
     id: string;

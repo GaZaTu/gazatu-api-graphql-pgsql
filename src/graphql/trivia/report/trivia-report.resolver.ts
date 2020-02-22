@@ -1,9 +1,10 @@
 import { Resolver, Mutation, Arg, ID, Query, Authorized, FieldResolver, Root } from 'type-graphql'
-import { getManager } from 'typeorm'
+import { getManager, In } from 'typeorm'
 import { TriviaReport } from './trivia-report.type'
 import { TriviaReportInput } from './trivia-report.input'
 import { TriviaQuestion } from '../question/trivia-question.type'
 import { UserRoles } from '../../user/role/user-role.type'
+import { CountResult } from '../../count.result'
 
 @Resolver(type => TriviaReport)
 export class TriviaReportResolver {
@@ -33,6 +34,18 @@ export class TriviaReportResolver {
     })
 
     return getManager().save(TriviaReport, report)
+  }
+
+  @Authorized(UserRoles.TRIVIA_ADMIN)
+  @Mutation(returns => CountResult, { complexity: 5 })
+  async removeTriviaReports(
+    @Arg('ids', type => [String]) ids: string[],
+  ) {
+    await getManager().remove(
+      await getManager().find(TriviaReport, { id: In(ids) })
+    )
+
+    return new CountResult(ids.length)
   }
 
   @FieldResolver(type => TriviaQuestion, { complexity: 5 })
