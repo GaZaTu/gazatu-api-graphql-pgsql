@@ -63,7 +63,7 @@ export class TriviaCategoryResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @Mutation(returns => CountResult, { complexity: 5 })
   async verifyTriviaCategories(
-    @Arg('ids', type => [String]) ids: string[],
+    @Arg('ids', type => [ID]) ids: string[],
   ) {
     const categories = await getManager().find(TriviaCategory, { id: In(ids) })
 
@@ -79,7 +79,7 @@ export class TriviaCategoryResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @Mutation(returns => CountResult, { complexity: 5 })
   async removeTriviaCategories(
-    @Arg('ids', type => [String]) ids: string[],
+    @Arg('ids', type => [ID]) ids: string[],
   ) {
     const categories = await getManager().find(TriviaCategory, { id: In(ids) })
 
@@ -95,8 +95,8 @@ export class TriviaCategoryResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @Mutation(returns => CountResult, { complexity: 5 })
   async mergeTriviaCategoriesInto(
-    @Arg('ids', type => [String]) ids: string[],
-    @Arg('targetId', type => String) targetId: string,
+    @Arg('ids', type => [ID]) ids: string[],
+    @Arg('targetId', type => ID) targetId: string,
   ) {
     const targetCategory = await getManager().findOneOrFail(TriviaCategory, targetId)
     const categories = await getManager().find(TriviaCategory, { id: In(ids) })

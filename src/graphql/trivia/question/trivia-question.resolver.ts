@@ -88,7 +88,7 @@ export class TriviaQuestionResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @Mutation(returns => CountResult, { complexity: 5 })
   async verifyTriviaQuestions(
-    @Arg('ids', type => [String]) ids: string[],
+    @Arg('ids', type => [ID]) ids: string[],
   ) {
     const questions = await getManager().find(TriviaQuestion, { id: In(ids) })
 
@@ -104,7 +104,7 @@ export class TriviaQuestionResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @Mutation(returns => CountResult, { complexity: 5 })
   async removeTriviaQuestions(
-    @Arg('ids', type => [String]) ids: string[],
+    @Arg('ids', type => [ID]) ids: string[],
   ) {
     const questions = await getManager().find(TriviaQuestion, { id: In(ids) })
 
@@ -120,8 +120,8 @@ export class TriviaQuestionResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @Mutation(returns => CountResult, { complexity: 5 })
   async categorizeTriviaQuestions(
-    @Arg('ids', type => [String]) ids: string[],
-    @Arg('categoryId', type => String) categoryId: string,
+    @Arg('ids', type => [ID]) ids: string[],
+    @Arg('categoryId', type => ID) categoryId: string,
   ) {
     const category = await getManager().findOneOrFail(TriviaCategory, categoryId)
     const questions = await getManager().find(TriviaQuestion, { id: In(ids) })

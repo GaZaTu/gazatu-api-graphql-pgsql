@@ -39,7 +39,7 @@ export class TriviaReportResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @Mutation(returns => CountResult, { complexity: 5 })
   async removeTriviaReports(
-    @Arg('ids', type => [String]) ids: string[],
+    @Arg('ids', type => [ID]) ids: string[],
   ) {
     await getManager().remove(
       await getManager().find(TriviaReport, { id: In(ids) })
