@@ -181,6 +181,13 @@ export class App {
             .andWhere('category."name" IN (:...includedCategories)', { includedCategories })
         }
 
+        if (ctx.query.submitters) {
+          const submitters = ctx.query.submitters.slice(1, -1).split(",")
+
+          query = query
+            .andWhere('question."submitter" IN (:...submitters)', { submitters })
+        }
+
         if (ctx.query.verified !== undefined) {
           query = query
             .andWhere('question."verified" = :verified', { verified: Boolean(ctx.query.verified) })
@@ -191,11 +198,6 @@ export class App {
           query = query
             .andWhere('question."disabled" = :disabled', { disabled: Boolean(ctx.query.disabled) })
             .andWhere('category."disabled" = :disabled', { disabled: Boolean(ctx.query.disabled) })
-        }
-
-        if (ctx.query.submitter !== undefined) {
-          query = query
-            .andWhere('question."submitter" = :submitter', { submitter: ctx.query.submitter })
         }
 
         if (!Boolean(ctx.query.shuffled)) {
