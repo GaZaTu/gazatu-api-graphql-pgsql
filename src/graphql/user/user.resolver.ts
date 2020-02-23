@@ -41,9 +41,9 @@ export class UserResolver {
 
     if (user) {
       if (isAdmin) {
-        user.roles = await getManager().find(UserRole, {
+        user.roles = input.roles.length ? await getManager().find(UserRole, {
           where: { id: In(input.roles.map(r => r.id)) },
-        })
+        }) : []
       }
 
       return getManager().save(user)
