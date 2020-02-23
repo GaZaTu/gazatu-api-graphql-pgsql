@@ -207,8 +207,7 @@ export interface User {
     roles?: UserRole[];
 }
 export interface UserInput {
-    username: string;
-    password: string;
+    roles: NodeRef[];
 }
 export interface UserRole {
     __typename?: 'UserRole';

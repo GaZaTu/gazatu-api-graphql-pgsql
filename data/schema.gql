@@ -228,8 +228,7 @@ type User implements Node {
 }
 
 input UserInput {
-  username: String!
-  password: String!
+  roles: [NodeRef!]!
 }
 
 type UserRole implements Node {

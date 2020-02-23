@@ -16,7 +16,7 @@ export class UserResolver {
   ) {
     const user = await getManager().findOne(User, id)
 
-    if (user?.id !== currentUser!.id) {
+    if (!user || user.id !== currentUser.id) {
       assertUserAuthorization(currentUser, [UserRoles.ADMIN])
     }
 
@@ -37,9 +37,14 @@ export class UserResolver {
     @Arg('input') input: UserInput,
   ) {
     const user = await this.user(currentUser, id)
+    const isAdmin = currentUser.roles?.some(r => r.name === 'admin')
 
     if (user) {
-      Object.assign(user, input)
+      if (isAdmin) {
+        user.roles = await getManager().find(UserRole, {
+          where: { id: In(input.roles.map(r => r.id)) },
+        })
+      }
 
       return getManager().save(user)
     } else {
