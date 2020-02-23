@@ -19,7 +19,16 @@ const normalizeNamedTypeVariable = (schema: gql.GraphQLSchema, type: gql.GraphQL
 
     if (inputType) {
       return (inputType.fields as any[] | undefined)
-        ?.map(field => ({ fieldName: field.name, value: normalizeVariableByType(schema, field.getType(), variable[field.name]) }))
+        ?.map(field => ({
+          fieldName: field.name,
+          value: (() => {
+            if (field.typeOptions.array) {
+              return (variable[field.name] as any[] | undefined)?.map(item => normalizeVariableByType(schema, field.getType(), item))
+            } else {
+              return normalizeVariableByType(schema, field.getType(), variable[field.name])
+            }
+          })(),
+        }))
         ?.reduce((o, { fieldName, value }) => { o[fieldName] = value; return o; }, {} as typeof variable)
     }
   }

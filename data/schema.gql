@@ -55,15 +55,16 @@ type Mutation {
   getOrAddUserRole(input: UserRoleInput!): UserRole!
   registerUser(password: String!, username: String!): AuthResult!
   saveTriviaQuestion(input: TriviaQuestionInput!): TriviaQuestion!
-  verifyTriviaQuestions(ids: [String!]!): CountResult!
-  removeTriviaQuestions(ids: [String!]!): CountResult!
-  categorizeTriviaQuestions(categoryId: String!, ids: [String!]!): CountResult!
+  verifyTriviaQuestions(ids: [ID!]!): CountResult!
+  removeTriviaQuestions(ids: [ID!]!): CountResult!
+  categorizeTriviaQuestions(categoryId: ID!, ids: [ID!]!): CountResult!
   importLegacyTriviaQuestions(input: [TriviaQuestionLegacyInput!]!): CountResult!
   saveTriviaCategory(input: TriviaCategoryInput!): TriviaCategory!
-  verifyTriviaCategories(ids: [String!]!): CountResult!
-  removeTriviaCategories(ids: [String!]!): CountResult!
-  mergeTriviaCategoriesInto(targetId: String!, ids: [String!]!): CountResult!
+  verifyTriviaCategories(ids: [ID!]!): CountResult!
+  removeTriviaCategories(ids: [ID!]!): CountResult!
+  mergeTriviaCategoriesInto(targetId: ID!, ids: [ID!]!): CountResult!
   reportTriviaQuestion(input: TriviaReportInput!): TriviaReport!
+  removeTriviaReports(ids: [ID!]!): CountResult!
 }
 
 interface Node {
@@ -227,8 +228,7 @@ type User implements Node {
 }
 
 input UserInput {
-  username: String!
-  password: String!
+  roles: [NodeRef!]!
 }
 
 type UserRole implements Node {

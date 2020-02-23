@@ -54,6 +54,7 @@ export interface Mutation {
     removeTriviaCategories?: CountResult;
     mergeTriviaCategoriesInto?: CountResult;
     reportTriviaQuestion?: TriviaReport;
+    removeTriviaReports?: CountResult;
 }
 export interface NodeRef {
     id: string;
@@ -206,8 +207,7 @@ export interface User {
     roles?: UserRole[];
 }
 export interface UserInput {
-    username: string;
-    password: string;
+    roles: NodeRef[];
 }
 export interface UserRole {
     __typename?: 'UserRole';

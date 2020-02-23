@@ -181,6 +181,13 @@ export class App {
             .andWhere('category."name" IN (:...includedCategories)', { includedCategories })
         }
 
+        if (ctx.query.submitters) {
+          const submitters = ctx.query.submitters.slice(1, -1).split(",")
+
+          query = query
+            .andWhere('question."submitter" IN (:...submitters)', { submitters })
+        }
+
         if (ctx.query.verified !== undefined) {
           query = query
             .andWhere('question."verified" = :verified', { verified: Boolean(ctx.query.verified) })
