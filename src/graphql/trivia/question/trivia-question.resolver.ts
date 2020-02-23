@@ -90,10 +90,15 @@ export class TriviaQuestionResolver {
   async verifyTriviaQuestions(
     @Arg('ids', type => [ID]) ids: string[],
   ) {
-    const questions = await getManager().find(TriviaQuestion, { id: In(ids) })
+    const questions = await getManager().find(TriviaQuestion, {
+      where: { id: In(ids) },
+      relations: ['category'],
+    })
 
     for (const question of questions) {
-      question.verified = true
+      if (question.category.verified && !question.category.disabled) {
+        question.verified = true
+      }
     }
 
     await getManager().save(questions)
