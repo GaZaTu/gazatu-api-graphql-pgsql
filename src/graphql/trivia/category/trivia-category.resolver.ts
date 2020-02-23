@@ -98,6 +98,10 @@ export class TriviaCategoryResolver {
     @Arg('ids', type => [ID]) ids: string[],
     @Arg('targetId', type => ID) targetId: string,
   ) {
+    if (ids.includes(targetId)) {
+      return new CountResult(0)
+    }
+
     const targetCategory = await getManager().findOneOrFail(TriviaCategory, targetId)
     const categories = await getManager().find(TriviaCategory, { id: In(ids) })
 
