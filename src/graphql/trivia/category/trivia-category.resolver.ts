@@ -136,6 +136,7 @@ export class TriviaCategoryResolver {
     return getRepository(TriviaQuestion)
       .createQueryBuilder('question')
       .where('question."categoryId" = :categoryId', { categoryId: category.id })
+      .andWhere('question."disabled" = false')
       .getMany()
   }
 }
