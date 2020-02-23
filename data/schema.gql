@@ -121,6 +121,7 @@ type TriviaCategory implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   questions: [TriviaQuestion!]
+  questionsCount: Float!
 }
 
 input TriviaCategoryInput {

@@ -98,6 +98,10 @@ export class TriviaCategoryResolver {
     @Arg('ids', type => [ID]) ids: string[],
     @Arg('targetId', type => ID) targetId: string,
   ) {
+    if (ids.includes(targetId)) {
+      return new CountResult(0)
+    }
+
     const targetCategory = await getManager().findOneOrFail(TriviaCategory, targetId)
     const categories = await getManager().find(TriviaCategory, { id: In(ids) })
 
@@ -127,11 +131,29 @@ export class TriviaCategoryResolver {
     @Root() category: TriviaCategory,
   ) {
     // return getManager().find(TriviaQuestion, {
-    //   where: { category: Equal(category) },
+    //   where: { category: Equal(category), disabled: false },
     // })
     return getRepository(TriviaQuestion)
       .createQueryBuilder('question')
       .where('question."categoryId" = :categoryId', { categoryId: category.id })
+      .andWhere('question."disabled" = false')
       .getMany()
+  }
+
+  @Authorized(UserRoles.TRIVIA_ADMIN)
+  @FieldResolver(type => Number, { complexity: 5 })
+  async questionsCount(
+    @Root() category: TriviaCategory,
+  ) {
+    // return getManager().count(TriviaQuestion, {
+    //   where: { category: Equal(category), disabled: false },
+    // })
+    return getRepository(TriviaQuestion)
+      .createQueryBuilder('question')
+      .select('count(*) AS count')
+      .where('question."categoryId" = :categoryId', { categoryId: category.id })
+      .andWhere('question."disabled" = false')
+      .getRawOne()
+      .then(r => Number(r.count))
   }
 }

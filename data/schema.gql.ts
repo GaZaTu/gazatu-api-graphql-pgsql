@@ -105,6 +105,7 @@ export interface TriviaCategory {
     createdAt?: DateTime;
     updatedAt?: DateTime;
     questions?: TriviaQuestion[] | null;
+    questionsCount?: number;
 }
 export interface TriviaCategoryInput {
     id?: string | null;
