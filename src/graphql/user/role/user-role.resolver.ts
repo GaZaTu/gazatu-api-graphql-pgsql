@@ -5,7 +5,6 @@ import { UserRoleInput } from './user-role.input'
 
 @Resolver(type => UserRole)
 export class UserRoleResolver {
-  @Authorized(UserRoles.ADMIN)
   @Query(returns => UserRole, { nullable: true, complexity: 2 })
   async userRole(
     @Arg('id', type => ID) id: string,
@@ -13,7 +12,6 @@ export class UserRoleResolver {
     return getManager().findOne(UserRole, id)
   }
 
-  @Authorized(UserRoles.ADMIN)
   @Query(returns => [UserRole], { complexity: 5 })
   async userRoles() {
     return getManager().find(UserRole)

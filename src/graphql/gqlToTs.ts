@@ -72,7 +72,7 @@ const gqlFieldToTsMethod = (definition: gql.FieldDefinitionNode) => {
 }
 
 const gqlFieldToTsPropertyOrMethod = (state: GraphQLToTypeScriptConverterState, definition: gql.FieldDefinitionNode | gql.InputValueDefinitionNode) => {
-  if (state.mode === 'full' && definition.kind === 'FieldDefinition' && definition.arguments ?.length) {
+  if (state.mode === 'full' && definition.kind === 'FieldDefinition' && definition.arguments?.length) {
     return gqlFieldToTsMethod(definition)
   } else {
     return gqlFieldToTsProperty(definition)
@@ -194,7 +194,7 @@ const createGqlInterfacesAsTsUnionsFromState = (state: GraphQLToTypeScriptConver
     ))
 }
 
-const gqlToTs = (gqlSchemaAsString: string) => {
+const gqlToTs = (gqlSchemaAsString: string, { mode }: { mode: 'simple' | 'full' } = { mode: 'simple' }) => {
   const resultFile = ts.createSourceFile(
     'schema.ts',
     '',
@@ -210,7 +210,7 @@ const gqlToTs = (gqlSchemaAsString: string) => {
   const gqlSchema = gql.parse(gqlSchemaAsString)
 
   const converterState: GraphQLToTypeScriptConverterState = {
-    mode: 'simple',
+    mode,
     interfacesImplementationsMap: new Map(),
   }
 
@@ -231,3 +231,10 @@ const gqlToTs = (gqlSchemaAsString: string) => {
 }
 
 export default gqlToTs
+
+// import { readFileSync, writeFileSync } from 'fs'
+
+// const schemaGql = readFileSync(`${__dirname}/../../data/schema.gql`, { encoding: 'utf-8' })
+// const schemaGqlTs = gqlToTs(schemaGql, { mode: 'full' })
+
+// writeFileSync(`${__dirname}/../../data/schema.gql.client.ts`, schemaGqlTs, { encoding: 'utf-8' })

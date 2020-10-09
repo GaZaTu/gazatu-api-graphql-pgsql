@@ -22,13 +22,15 @@ const findOneWithDataloader = <Entity>(manager: EntityManager, Type: Function, i
       .find(column => true) as string
 
     registeredDataloader = new Dataloader(async ids => {
-      const results = await manager.find(Type, {
-        where: {
-          [idColumnName]: In(ids as any[]),
-        },
-      })
+      const results = new Map(
+        await manager.find(Type, {
+          where: {
+            [idColumnName]: In(ids as any[]),
+          },
+        }).then(entities => entities.map(entity => [(entity as any)[idColumnName], entity]))
+      )
 
-      return ids.map(id => results.find(result => (result as any)[idColumnName] === id))
+      return ids.map(id => results.get(id))
     }, {
       cache: false,
     })
