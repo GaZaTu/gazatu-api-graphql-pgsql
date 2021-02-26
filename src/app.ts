@@ -24,7 +24,7 @@ import './graphql/dataloader-typeorm'
 import { readFileSync } from 'fs'
 import { router } from './rest'
 
-function koaGraphQLlMiddleware(schema: gql.GraphQLSchema, contextValue?: (ctx: Koa.Context) => unknown): Koa.Middleware {
+function koaGraphQLMiddleware(schema: gql.GraphQLSchema, contextValue?: (ctx: Koa.Context) => unknown): Koa.Middleware {
   return async (ctx, next) => {
     if (ctx.path === '/graphql' && ctx.method === 'POST') {
       const document = gql.parse(ctx.request.body.query)
@@ -147,12 +147,18 @@ export class App {
       return undefined
     }
 
-    this.koa.use(koaGraphQLlMiddleware(App.gqlSchema, async ctx => {
-      return {
-        currentUser: await getCurrentUserFromAuthorization(ctx.get('Authorization')),
-        sessionId: ctx.ip,
-      } as Context
-    }))
+    this.koa.use(async (ctx, next) => {
+      if (['GET', 'POST', 'PUT', 'DELETE'].includes(ctx.method)) {
+        ctx.authContext = {
+          currentUser: await getCurrentUserFromAuthorization(ctx.get('Authorization')),
+          sessionId: ctx.ip,
+        }
+      }
+
+      await next()
+    })
+
+    this.koa.use(koaGraphQLMiddleware(App.gqlSchema, ctx => ctx.authContext as Context))
 
     if (useLogger) {
       // applyGraphQLLogger(App.gqlSchema)

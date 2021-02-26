@@ -4,11 +4,12 @@ import { Node } from '../../node/node.interface'
 import { toGlobalId } from 'graphql-relay'
 import * as uuid from 'uuid'
 import { GraphQlUnknown } from '../../meta/unknown.type'
+import { PartialNullable } from '../../PartialNullable'
 
 @Entity()
 @ObjectType({ implements: [Node] })
 export class AnalyticsError implements Node {
-  constructor(init?: Partial<AnalyticsError>) {
+  constructor(init?: PartialNullable<AnalyticsError>) {
     Object.assign(this, init)
   }
 
@@ -42,6 +43,6 @@ export class AnalyticsError implements Node {
 
   @BeforeInsert()
   protected beforeInsert() {
-    this.id = toGlobalId(this.constructor.name, uuid())
+    this.id = toGlobalId(this.constructor.name, uuid.v4())
   }
 }

@@ -31,30 +31,32 @@ export class TriviaQuestionResolver {
     @Ctx('currentUser') currentUser: ExportableUser | undefined,
     @Args() connectionArgs: ConnectionArgs,
     @Args() searchAndSortArgs: SearchAndSortArgs,
-    @Arg('verified', type => Boolean, { nullable: true }) verified?: boolean,
-    @Arg('disabled', type => Boolean, { nullable: true }) disabled = false,
-    @Arg('reported', type => Boolean, { nullable: true }) reported?: boolean,
-    @Arg('dangling', type => Boolean, { nullable: true }) dangling?: boolean,
+    @Arg('verified', type => Boolean, { nullable: true }) verified: boolean | null,
+    @Arg('disabled', type => Boolean, { nullable: true }) disabled: boolean | null,
+    @Arg('reported', type => Boolean, { nullable: true }) reported: boolean | null,
+    @Arg('dangling', type => Boolean, { nullable: true }) dangling: boolean | null,
   ) {
+    disabled ??= false
+
     return selectConnection(TriviaQuestion, connectionArgs, searchAndSortArgs, 'question', query => {
-      if (verified !== undefined) {
+      if (verified !== null) {
         query = query
           .andWhere('question."verified" = :verified', { verified })
       }
 
-      if (disabled !== undefined) {
+      if (disabled !== null) {
         query = query
           .andWhere('question."disabled" = :disabled', { disabled })
       }
 
-      if (reported !== undefined) {
+      if (reported !== null) {
         assertUserAuthorization(currentUser, [UserRoles.TRIVIA_ADMIN])
 
         query = query
           .andWhere(`${reported ? 'EXISTS' : 'NOT EXISTS'} ${query.subQuery().select('1').from(TriviaReport, 'report').where('report."questionId" = question."id"').getQuery()}`)
       }
 
-      if (dangling !== undefined) {
+      if (dangling !== null) {
         query = query
           .andWhere(`${query.subQuery().select('(NOT category."verified") OR (category."disabled")').from(TriviaCategory, 'category').where('question."categoryId" = category."id"').getQuery()} = :dangling`, { dangling })
       }
@@ -75,7 +77,7 @@ export class TriviaQuestionResolver {
     }
 
     const question = new TriviaQuestion({
-      id,
+      id: id ?? undefined,
       ...questionInput,
       category: await getManager().findOne(TriviaCategory, category.id),
       language: await getManager().findOne(Language, language.id),
@@ -188,17 +190,17 @@ export class TriviaQuestionResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @FieldResolver(type => User, { nullable: true, complexity: 5 })
   async submitterUser(
-    @Root() question: TriviaQuestion,
+    @Root() { submitterUserId }: TriviaQuestion,
   ) {
-    return getManager().findOne(User, question.submitterUserId)
+    return submitterUserId && getManager().findOne(User, submitterUserId)
   }
 
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @FieldResolver(type => User, { nullable: true, complexity: 5 })
   async updatedBy(
-    @Root() question: TriviaQuestion,
+    @Root() { updatedById }: TriviaQuestion,
   ) {
-    return getManager().findOne(User, question.updatedById)
+    return updatedById && getManager().findOne(User, updatedById)
   }
 
   @Authorized(UserRoles.TRIVIA_ADMIN)

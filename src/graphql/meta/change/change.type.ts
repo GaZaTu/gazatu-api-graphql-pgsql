@@ -3,6 +3,7 @@ import { ObjectType, Field, ID, registerEnumType } from 'type-graphql'
 import { Node } from '../../node/node.interface'
 import { toGlobalId } from 'graphql-relay'
 import * as uuid from 'uuid'
+import { PartialNullable } from '../../PartialNullable'
 
 export enum ChangeKind {
   INSERT = 'INSERT',
@@ -17,7 +18,7 @@ registerEnumType(ChangeKind, {
 @Entity()
 @ObjectType({ implements: [Node] })
 export class Change implements Node {
-  constructor(init?: Partial<Change>) {
+  constructor(init?: PartialNullable<Change>) {
     Object.assign(this, init)
   }
 
@@ -33,17 +34,17 @@ export class Change implements Node {
   @Field()
   targetEntityName!: string
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  targetId?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  targetId!: string | null
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  targetColumn?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  targetColumn!: string | null
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  newColumnValue?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  newColumnValue!: string | null
 
   @CreateDateColumn()
   @Field()
@@ -51,6 +52,6 @@ export class Change implements Node {
 
   @BeforeInsert()
   protected beforeInsert() {
-    this.id = toGlobalId(this.constructor.name, uuid())
+    this.id = toGlobalId(this.constructor.name, uuid.v4())
   }
 }

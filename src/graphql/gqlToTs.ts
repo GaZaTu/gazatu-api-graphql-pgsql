@@ -29,9 +29,9 @@ const gqlTypeNameToTsTypeName = (typeName: string): string => {
 const gqlTypeToTsType = (type: gql.TypeNode): ts.TypeNode => {
   switch (type.kind) {
     case 'ListType':
-      return ts.createUnionTypeNode([ts.createArrayTypeNode(gqlTypeToTsType(type.type)), ts.createNull()])
+      return ts.createUnionTypeNode([ts.createArrayTypeNode(gqlTypeToTsType(type.type)), ts.createTypeReferenceNode('null')])
     case 'NamedType':
-      return ts.createUnionTypeNode([ts.createTypeReferenceNode(gqlTypeNameToTsTypeName(type.name.value), undefined), ts.createNull()])
+      return ts.createUnionTypeNode([ts.createTypeReferenceNode(gqlTypeNameToTsTypeName(type.name.value), undefined), ts.createTypeReferenceNode('null')])
     case 'NonNullType': {
       return unwrapNullableTsType(gqlTypeToTsType(type.type))
     }

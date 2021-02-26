@@ -77,7 +77,7 @@ export class ChangeSubscriber implements EntitySubscriberInterface {
       ))
     )
 
-    pubsub.publish('CHANGES', { id: 'synthetic', ...change, createdAt: new Date() })
+    pubsub.publish('CHANGES', { ...change, id: 'synthetic', createdAt: new Date() })
   }
 
   async afterRemove(event: RemoveEvent<Node>) {

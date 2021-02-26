@@ -3,11 +3,12 @@ import { ObjectType, Field, ID } from 'type-graphql'
 import { Node } from '../../node/node.interface'
 import { toGlobalId } from 'graphql-relay'
 import * as uuid from 'uuid'
+import { PartialNullable } from '../../PartialNullable'
 
 @Entity()
 @ObjectType({ implements: [Node] })
 export class Language implements Node {
-  constructor(init?: Partial<Language>) {
+  constructor(init?: PartialNullable<Language>) {
     Object.assign(this, init)
   }
 
@@ -19,13 +20,13 @@ export class Language implements Node {
   @Field()
   name!: string
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  languageCode?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  languageCode!: string | null
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  countryCode?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  countryCode!: string | null
 
   @CreateDateColumn()
   @Field()
@@ -37,6 +38,6 @@ export class Language implements Node {
 
   @BeforeInsert()
   protected beforeInsert() {
-    this.id = toGlobalId(this.constructor.name, uuid())
+    this.id = toGlobalId(this.constructor.name, uuid.v4())
   }
 }

@@ -8,9 +8,12 @@ import { TriviaQuestion } from '../../graphql/trivia/question/trivia-question.ty
 export const router = new Router()
 
 router.get('/trivia/questions', async ctx => {
-  ctx.query.verified = ctx.query.verified ?? true
-  ctx.query.disabled = ctx.query.disabled ?? false
-  ctx.query.shuffled = ctx.query.shuffled ?? true
+  const exclude = ctx.query.exclude as string
+  const include = ctx.query.include as string
+  const submitters = ctx.query.submitters as string
+  const verified = (ctx.query.verified ?? 'true' as string) === 'true'
+  const disabled = (ctx.query.disabled ?? 'false' as string) === 'true'
+  const shuffled = (ctx.query.shuffled ?? 'true' as string) === 'true'
 
   let query = getRepository(TriviaQuestion)
     .createQueryBuilder('question')
@@ -18,45 +21,45 @@ router.get('/trivia/questions', async ctx => {
     .innerJoinAndSelect(Language, 'language', 'question."languageId" = language."id"')
     .where('1 = 1')
 
-  if (ctx.query.exclude) {
-    const excludedCategories = ctx.query.exclude.slice(1, -1).split(",")
+  if (exclude) {
+    const excludedCategories = exclude.slice(1, -1).split(",")
 
     query = query
       .andWhere('category."name" NOT IN (:...excludedCategories)', { excludedCategories })
-  } else if (ctx.query.include) {
-    const includedCategories = ctx.query.include.slice(1, -1).split(",")
+  } else if (include) {
+    const includedCategories = include.slice(1, -1).split(",")
 
     query = query
       .andWhere('category."name" IN (:...includedCategories)', { includedCategories })
   }
 
-  if (ctx.query.submitters) {
-    const submitters = ctx.query.submitters.slice(1, -1).split(",")
+  if (submitters) {
+    const includedSubmitters = submitters.slice(1, -1).split(",")
 
     query = query
-      .andWhere('question."submitter" IN (:...submitters)', { submitters })
+      .andWhere('question."submitter" IN (:...includedSubmitters)', { includedSubmitters })
   }
 
-  if (ctx.query.verified !== undefined) {
+  if (verified !== undefined) {
     query = query
-      .andWhere('question."verified" = :verified', { verified: Boolean(ctx.query.verified) })
-      .andWhere('category."verified" = :verified', { verified: Boolean(ctx.query.verified) })
+      .andWhere('question."verified" = :verified', { verified })
+      .andWhere('category."verified" = :verified', { verified })
   }
 
-  if (ctx.query.disabled !== undefined) {
+  if (disabled !== undefined) {
     query = query
-      .andWhere('question."disabled" = :disabled', { disabled: Boolean(ctx.query.disabled) })
-      .andWhere('category."disabled" = :disabled', { disabled: Boolean(ctx.query.disabled) })
+      .andWhere('question."disabled" = :disabled', { disabled })
+      .andWhere('category."disabled" = :disabled', { disabled })
   }
 
-  if (!Boolean(ctx.query.shuffled)) {
+  if (shuffled === false) {
     query = query
       .addOrderBy('question."createdAt"', 'DESC')
   }
 
   let questions = await query.getRawMany()
 
-  if (Boolean(ctx.query.shuffled)) {
+  if (shuffled === true) {
     const shuffleInPlace = <T>(a: T[]): T[] => {
       for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))

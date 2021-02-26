@@ -6,16 +6,16 @@ import { UserRoles } from '../../user/role/user-role.type'
 @ArgsType()
 export class NewChangeSubscriptionArgs {
   @Field(type => ChangeKind, { nullable: true })
-  kind?: ChangeKind
+  kind!: ChangeKind | null
 
-  @Field({ nullable: true })
-  targetEntityName?: string
+  @Field(type => String, { nullable: true })
+  targetEntityName!: string | null
 
-  @Field({ nullable: true })
-  targetId?: string
+  @Field(type => String, { nullable: true })
+  targetId!: string | null
 
-  @Field({ nullable: true })
-  targetColumn?: string
+  @Field(type => String, { nullable: true })
+  targetColumn!: string | null
 }
 
 @Resolver(type => Change)

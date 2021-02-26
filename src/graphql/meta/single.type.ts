@@ -1,8 +1,9 @@
 import { Entity, PrimaryColumn, getManager } from 'typeorm'
+import { PartialNullable } from '../PartialNullable'
 
 @Entity()
 export class SingleEntity {
-  constructor(init?: Partial<SingleEntity>) {
+  constructor(init?: PartialNullable<SingleEntity>) {
     Object.assign(this, init)
   }
 

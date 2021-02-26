@@ -19,21 +19,23 @@ export class TriviaCategoryResolver {
 
   @Query(returns => [TriviaCategory], { complexity: 5 })
   async triviaCategories(
-    @Arg('verified', type => Boolean, { nullable: true }) verified?: boolean,
-    @Arg('disabled', type => Boolean, { nullable: true }) disabled = false,
+    @Arg('verified', type => Boolean, { nullable: true }) verified: boolean | null,
+    @Arg('disabled', type => Boolean, { nullable: true }) disabled: boolean | null,
   ) {
+    disabled ??= false
+
     let query = getRepository(TriviaCategory)
       .createQueryBuilder('category')
       .select()
       .where('1 = 1')
       .orderBy('name', 'ASC')
 
-    if (verified !== undefined) {
+    if (verified !== null) {
       query = query
         .andWhere('category."verified" = :verified', { verified })
     }
 
-    if (disabled !== undefined) {
+    if (disabled !== null) {
       query = query
         .andWhere('category."disabled" = :disabled', { disabled })
     }
@@ -53,7 +55,7 @@ export class TriviaCategoryResolver {
     }
 
     const category = new TriviaCategory({
-      id,
+      id: id ?? undefined,
       ...categoryInput,
     })
 

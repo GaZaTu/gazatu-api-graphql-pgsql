@@ -1,17 +1,16 @@
 import { InputType, Field, ID } from 'type-graphql'
-import { TriviaCategory } from './trivia-category.type'
 
 @InputType()
-export class TriviaCategoryInput implements Partial<TriviaCategory> {
+export class TriviaCategoryInput {
   @Field(type => ID, { nullable: true })
-  id?: string
+  id!: string | null
 
   @Field()
   name!: string
 
-  @Field({ nullable: true })
-  description?: string
+  @Field(type => String, { nullable: true })
+  description!: string | null
 
-  @Field({ nullable: true })
-  submitter?: string
+  @Field(type => String, { nullable: true })
+  submitter!: string | null
 }
