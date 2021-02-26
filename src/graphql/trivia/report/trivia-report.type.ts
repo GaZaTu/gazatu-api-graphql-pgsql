@@ -4,11 +4,12 @@ import { Node } from '../../node/node.interface'
 import { TriviaQuestion } from '../question/trivia-question.type'
 import * as uuid from 'uuid'
 import { toGlobalId } from 'graphql-relay'
+import { PartialNullable } from '../../PartialNullable'
 
 @Entity()
 @ObjectType({ implements: [Node] })
 export class TriviaReport implements Node {
-  constructor(init?: Partial<TriviaReport>) {
+  constructor(init?: PartialNullable<TriviaReport>) {
     Object.assign(this, init)
   }
 
@@ -40,6 +41,6 @@ export class TriviaReport implements Node {
 
   @BeforeInsert()
   protected beforeInsert() {
-    this.id = toGlobalId(this.constructor.name, uuid())
+    this.id = toGlobalId(this.constructor.name, uuid.v4())
   }
 }

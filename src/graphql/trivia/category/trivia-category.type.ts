@@ -4,11 +4,12 @@ import { Node } from '../../node/node.interface'
 import { User } from '../../user/user.type'
 import { toGlobalId } from 'graphql-relay'
 import * as uuid from 'uuid'
+import { PartialNullable } from '../../PartialNullable'
 
 @Entity()
 @ObjectType({ implements: [Node] })
 export class TriviaCategory implements Node {
-  constructor(init?: Partial<TriviaCategory>) {
+  constructor(init?: PartialNullable<TriviaCategory>) {
     Object.assign(this, init)
   }
 
@@ -20,19 +21,19 @@ export class TriviaCategory implements Node {
   @Field()
   name!: string
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  description?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  description!: string | null
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  submitter?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  submitter!: string | null
 
   @ManyToOne(type => User, { nullable: true, onDelete: 'SET NULL' })
-  submitterUser?: User
+  submitterUser!: User | null
 
   @RelationId((self: TriviaCategory) => self.submitterUser)
-  submitterUserId?: string
+  submitterUserId!: string | null
 
   @Column({ default: false })
   @Field({ defaultValue: false })
@@ -52,6 +53,6 @@ export class TriviaCategory implements Node {
 
   @BeforeInsert()
   protected beforeInsert() {
-    this.id = toGlobalId(this.constructor.name, uuid())
+    this.id = toGlobalId(this.constructor.name, uuid.v4())
   }
 }

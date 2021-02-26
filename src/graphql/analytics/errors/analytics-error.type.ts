@@ -3,12 +3,13 @@ import { ObjectType, Field, ID } from 'type-graphql'
 import { Node } from '../../node/node.interface'
 import { toGlobalId } from 'graphql-relay'
 import * as uuid from 'uuid'
+import { GraphQlUnknown } from '../../meta/unknown.type'
 import { PartialNullable } from '../../PartialNullable'
 
 @Entity()
 @ObjectType({ implements: [Node] })
-export class Language implements Node {
-  constructor(init?: PartialNullable<Language>) {
+export class AnalyticsError implements Node {
+  constructor(init?: PartialNullable<AnalyticsError>) {
     Object.assign(this, init)
   }
 
@@ -18,22 +19,26 @@ export class Language implements Node {
 
   @Column()
   @Field()
-  name!: string
+  type!: string
 
-  @Column({ type: String, nullable: true })
-  @Field(type => String, { nullable: true })
-  languageCode!: string | null
+  @Column()
+  @Field()
+  url!: string
 
-  @Column({ type: String, nullable: true })
-  @Field(type => String, { nullable: true })
-  countryCode!: string | null
+  @Column()
+  @Field()
+  userAgent!: string
+
+  @Column('json')
+  @Field(type => GraphQlUnknown)
+  body!: unknown
 
   @CreateDateColumn()
-  @Field()
+  @Field(type => Date)
   createdAt!: Date
 
   @UpdateDateColumn()
-  @Field()
+  @Field(type => Date)
   updatedAt!: Date
 
   @BeforeInsert()

@@ -14,14 +14,14 @@ export class TriviaQuestionLegacyInput {
   @Field()
   language!: string
 
-  @Field({ nullable: true })
-  hint1?: string
+  @Field(type => String, { nullable: true })
+  hint1!: string | null
 
-  @Field({ nullable: true })
-  hint2?: string
+  @Field(type => String, { nullable: true })
+  hint2!: string | null
 
-  @Field({ nullable: true })
-  submitter?: string
+  @Field(type => String, { nullable: true })
+  submitter!: string | null
 
   @Field()
   verified!: boolean

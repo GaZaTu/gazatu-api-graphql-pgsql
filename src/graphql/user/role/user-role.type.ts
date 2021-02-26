@@ -4,12 +4,13 @@ import { Node } from '../../node/node.interface'
 import * as uuid from 'uuid'
 import { toGlobalId } from 'graphql-relay'
 import { OptOutOfChangeLogging } from '../../meta/change/change.subscriber'
+import { PartialNullable } from '../../PartialNullable'
 
 @OptOutOfChangeLogging()
 @Entity()
 @ObjectType({ implements: [Node] })
 export class UserRole implements Node {
-  constructor(init?: Partial<UserRole>) {
+  constructor(init?: PartialNullable<UserRole>) {
     Object.assign(this, init)
   }
 
@@ -21,13 +22,13 @@ export class UserRole implements Node {
   @Field()
   name!: string
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  description?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  description!: string | null
 
   @BeforeInsert()
   protected beforeInsert() {
-    this.id = toGlobalId(this.constructor.name, uuid())
+    this.id = toGlobalId(this.constructor.name, uuid.v4())
   }
 }
 

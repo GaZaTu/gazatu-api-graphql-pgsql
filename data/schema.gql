@@ -8,20 +8,44 @@ type AuthResult {
   user: User!
 }
 
+type BlogEntry implements Node {
+  createdAt: DateTime!
+  id: ID!
+  imageAsBase64: String
+  imageAsDataURL: String
+  imageFileExtension: String
+  imageMimeType: String
+  message: String
+  story: String!
+  title: String!
+  updatedAt: DateTime!
+}
+
+input BlogEntryInput {
+  id: ID
+  imageAsBase64: String
+  imageAsDataURL: String
+  imageFileExtension: String
+  imageMimeType: String
+  message: String
+  story: String
+  title: String
+}
+
 type Change implements Node {
+  createdAt: DateTime!
   id: ID!
   kind: ChangeKind!
+  newColumnValue: String
+  targetColumn: String
   targetEntityName: String!
   targetId: String
-  targetColumn: String
-  newColumnValue: String
-  createdAt: DateTime!
 }
 
 enum ChangeKind {
   INSERT
-  UPDATE
   REMOVE
+  UPDATE
 }
 
 type CountResult {
@@ -33,38 +57,44 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
+type IDsResult {
+  ids: [ID!]!
+}
+
 type Language implements Node {
-  id: ID!
-  name: String!
-  languageCode: String
   countryCode: String
   createdAt: DateTime!
+  id: ID!
+  languageCode: String
+  name: String!
   updatedAt: DateTime!
 }
 
 input LanguageInput {
-  name: String!
-  languageCode: String!
   countryCode: String!
+  languageCode: String!
+  name: String!
 }
 
 type Mutation {
   addLanguage(input: LanguageInput!): Language!
-  updateUser(input: UserInput!, id: ID!): User
+  categorizeTriviaQuestions(categoryId: ID!, ids: [ID!]!): CountResult!
   deleteUser(id: ID!): CountResult!
   getOrAddUserRole(input: UserRoleInput!): UserRole!
-  registerUser(password: String!, username: String!): AuthResult!
-  saveTriviaQuestion(input: TriviaQuestionInput!): TriviaQuestion!
-  verifyTriviaQuestions(ids: [ID!]!): CountResult!
-  removeTriviaQuestions(ids: [ID!]!): CountResult!
-  categorizeTriviaQuestions(categoryId: ID!, ids: [ID!]!): CountResult!
   importLegacyTriviaQuestions(input: [TriviaQuestionLegacyInput!]!): CountResult!
-  saveTriviaCategory(input: TriviaCategoryInput!): TriviaCategory!
-  verifyTriviaCategories(ids: [ID!]!): CountResult!
+  mergeTriviaCategoriesInto(ids: [ID!]!, targetId: ID!): CountResult!
+  registerUser(password: String!, username: String!): AuthResult!
   removeTriviaCategories(ids: [ID!]!): CountResult!
-  mergeTriviaCategoriesInto(targetId: ID!, ids: [ID!]!): CountResult!
-  reportTriviaQuestion(input: TriviaReportInput!): TriviaReport!
+  removeTriviaQuestions(ids: [ID!]!): CountResult!
   removeTriviaReports(ids: [ID!]!): CountResult!
+  reportTriviaQuestion(input: TriviaReportInput!): TriviaReport!
+  saveBlogEntries(input: [BlogEntryInput!]!): IDsResult!
+  saveBlogEntry(input: BlogEntryInput!): BlogEntry!
+  saveTriviaCategory(input: TriviaCategoryInput!): TriviaCategory!
+  saveTriviaQuestion(input: TriviaQuestionInput!): TriviaQuestion!
+  updateUser(id: ID!, input: UserInput!): User
+  verifyTriviaCategories(ids: [ID!]!): CountResult!
+  verifyTriviaQuestions(ids: [ID!]!): CountResult!
 }
 
 interface Node {
@@ -76,30 +106,32 @@ input NodeRef {
 }
 
 type PageInfo {
-  startCursor: String
-  endCursor: String
-  hasPreviousPage: Boolean!
-  hasNextPage: Boolean!
   count: Int!
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
 }
 
 type Query {
+  authenticate(password: String!, username: String!): AuthResult!
+  blogEntries(createdAt: DateTime, story: String): [BlogEntry!]!
+  blogEntry(id: ID!): BlogEntry
+  changes: [Change!]!
+  currentUser: User
   language(id: ID!): Language
   languages: [Language!]!
-  changes: [Change!]!
-  user(id: ID!): User
-  users: [User!]!
-  currentUser: User
-  userRole(id: ID!): UserRole
-  userRoles: [UserRole!]!
-  authenticate(password: String!, username: String!): AuthResult!
-  triviaQuestion(id: ID!): TriviaQuestion
-  triviaQuestions(dangling: Boolean, reported: Boolean, disabled: Boolean, verified: Boolean, search: String, sortField: String, sortDirection: SortDirection = ASC, before: String, after: String, first: Int, last: Int): TriviaQuestionConnection!
-  triviaCategory(id: ID!): TriviaCategory
   triviaCategories(disabled: Boolean, verified: Boolean): [TriviaCategory!]!
+  triviaCategory(id: ID!): TriviaCategory
+  triviaCounts: TriviaCounts!
+  triviaQuestion(id: ID!): TriviaQuestion
+  triviaQuestions(after: String, before: String, dangling: Boolean, disabled: Boolean, first: Int, last: Int, reported: Boolean, search: String, sortDirection: SortDirection = ASC, sortField: String, verified: Boolean): TriviaQuestionConnection!
   triviaReport(id: ID!): TriviaReport
   triviaReports: [TriviaReport!]!
-  triviaCounts: TriviaCounts!
+  user(id: ID!): User
+  userRole(id: ID!): UserRole
+  userRoles: [UserRole!]!
+  users: [User!]!
 }
 
 enum SortDirection {
@@ -108,56 +140,56 @@ enum SortDirection {
 }
 
 type Subscription {
-  newChange(kind: ChangeKind, targetEntityName: String, targetId: String, targetColumn: String): Change!
+  newChange(kind: ChangeKind, targetColumn: String, targetEntityName: String, targetId: String): Change!
 }
 
 type TriviaCategory implements Node {
+  createdAt: DateTime!
+  description: String
+  disabled: Boolean
   id: ID!
   name: String!
-  description: String
-  submitter: String
-  verified: Boolean
-  disabled: Boolean
-  createdAt: DateTime!
-  updatedAt: DateTime!
   questions: [TriviaQuestion!]
   questionsCount: Float!
+  submitter: String
+  updatedAt: DateTime!
+  verified: Boolean
 }
 
 input TriviaCategoryInput {
+  description: String
   id: ID
   name: String!
-  description: String
   submitter: String
 }
 
 type TriviaCounts {
-  questionsCount: Float!
-  unverifiedQuestionsCount: Float!
   categoriesCount: Float!
-  unverifiedCategoriesCount: Float!
-  reportsCount: Float!
-  reportedQuestionsCount: Float!
   danglingQuestionsCount: Float!
+  questionsCount: Float!
+  reportedQuestionsCount: Float!
+  reportsCount: Float!
+  unverifiedCategoriesCount: Float!
+  unverifiedQuestionsCount: Float!
 }
 
 type TriviaQuestion implements Node {
-  id: ID!
-  question: String!
   answer: String!
+  category: TriviaCategory!
+  createdAt: DateTime!
+  disabled: Boolean
   hint1: String
   hint2: String
-  submitter: String
-  verified: Boolean
-  disabled: Boolean
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  version: Float!
-  category: TriviaCategory!
+  id: ID!
   language: Language!
-  submitterUser: User
-  updatedBy: User
+  question: String!
   reports: [TriviaReport!]
+  submitter: String
+  submitterUser: User
+  updatedAt: DateTime!
+  updatedBy: User
+  verified: Boolean
+  version: Float!
 }
 
 type TriviaQuestionConnection {
@@ -166,66 +198,56 @@ type TriviaQuestionConnection {
 }
 
 type TriviaQuestionEdge {
-  node: TriviaQuestion!
   cursor: String!
+  node: TriviaQuestion!
 }
 
 input TriviaQuestionInput {
-  id: ID
-  question: String!
   answer: String!
   category: NodeRef!
-  language: NodeRef!
   hint1: String
   hint2: String
+  id: ID
+  language: NodeRef!
+  question: String!
   submitter: String
 }
 
 input TriviaQuestionLegacyInput {
-  question: String!
   answer: String!
   category: String!
-  language: String!
+  createdAt: DateTime!
+  disabled: Boolean!
   hint1: String
   hint2: String
+  language: String!
+  question: String!
   submitter: String
-  verified: Boolean!
-  disabled: Boolean!
-  createdAt: DateTime!
   updatedAt: DateTime!
+  verified: Boolean!
 }
 
 type TriviaReport implements Node {
+  createdAt: DateTime!
   id: ID!
   message: String!
-  submitter: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
   question: TriviaQuestion!
+  submitter: String!
+  updatedAt: DateTime!
 }
 
 input TriviaReportInput {
-  questionId: ID!
   message: String!
+  questionId: ID!
   submitter: String!
 }
 
-type TriviaStatistics {
-  questionsCount: Float!
-  verifiedQuestionsCount: Float!
-  categoriesCount: Float!
-  verifiedCategoriesCount: Float!
-  topCategories: [TriviaCategory!]!
-  topSubmitters: [String!]!
-  submissionDates: [DateTime!]!
-}
-
 type User implements Node {
-  id: ID!
-  username: String!
   createdAt: DateTime!
-  updatedAt: DateTime!
+  id: ID!
   roles: [UserRole!]!
+  updatedAt: DateTime!
+  username: String!
 }
 
 input UserInput {
@@ -233,9 +255,9 @@ input UserInput {
 }
 
 type UserRole implements Node {
+  description: String
   id: ID!
   name: String!
-  description: String
 }
 
 input UserRoleInput {

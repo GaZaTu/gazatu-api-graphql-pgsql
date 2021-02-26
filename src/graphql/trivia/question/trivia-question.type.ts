@@ -7,11 +7,12 @@ import { Language } from '../../meta/language/language.type'
 import { toGlobalId } from 'graphql-relay'
 import * as uuid from 'uuid'
 import { ToTSVector, TSVectorColumn } from '../../tsvector'
+import { PartialNullable } from '../../PartialNullable'
 
 @Entity()
 @ObjectType({ implements: [Node] })
 export class TriviaQuestion implements Node {
-  constructor(init?: Partial<TriviaQuestion>) {
+  constructor(init?: PartialNullable<TriviaQuestion>) {
     Object.assign(this, init)
   }
 
@@ -43,25 +44,25 @@ export class TriviaQuestion implements Node {
   languageId!: string
 
   @ToTSVector()
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  hint1?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  hint1!: string | null
 
   @ToTSVector()
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  hint2?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  hint2!: string | null
 
   @ToTSVector()
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  submitter?: string
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  submitter!: string | null
 
   @ManyToOne(type => User, { nullable: true, onDelete: 'SET NULL' })
-  submitterUser?: User
+  submitterUser!: User | null
 
   @RelationId((self: TriviaQuestion) => self.submitterUser)
-  submitterUserId?: string
+  submitterUserId!: string | null
 
   @Column({ default: false })
   @Field({ defaultValue: false })
@@ -72,10 +73,10 @@ export class TriviaQuestion implements Node {
   disabled!: boolean
 
   @ManyToOne(type => User, { nullable: true, onDelete: 'SET NULL' })
-  updatedBy?: User
+  updatedBy!: User | null
 
   @RelationId((self: TriviaQuestion) => self.updatedBy)
-  updatedById?: string
+  updatedById!: string | null
 
   @CreateDateColumn()
   @Field()
@@ -90,10 +91,10 @@ export class TriviaQuestion implements Node {
   version!: number
 
   @TSVectorColumn()
-  tsvectorColumn?: any
+  tsvectorColumn!: any | null
 
   @BeforeInsert()
   protected beforeInsert() {
-    this.id = toGlobalId(this.constructor.name, uuid())
+    this.id = toGlobalId(this.constructor.name, uuid.v4())
   }
 }

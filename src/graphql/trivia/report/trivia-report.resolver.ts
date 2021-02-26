@@ -19,7 +19,7 @@ export class TriviaReportResolver {
   @Authorized(UserRoles.TRIVIA_ADMIN)
   @Query(returns => [TriviaReport], { complexity: 5 })
   async triviaReports() {
-    return getManager().find(TriviaReport)
+    return getManager().find(TriviaReport, { order: { updatedAt: 'DESC' }})
   }
 
   @Mutation(returns => TriviaReport, { complexity: 5 })

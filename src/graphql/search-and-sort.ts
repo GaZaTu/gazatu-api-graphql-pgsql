@@ -12,10 +12,10 @@ registerEnumType(SortDirection, {
 @ArgsType()
 export class SearchAndSortArgs {
   @Field(type => String, { nullable: true })
-  search?: string
+  search!: string | null
 
   @Field(type => String, { nullable: true })
-  sortField?: string
+  sortField!: string | null
 
   @Field(type => SortDirection, { defaultValue: SortDirection.ASC })
   sortDirection!: SortDirection

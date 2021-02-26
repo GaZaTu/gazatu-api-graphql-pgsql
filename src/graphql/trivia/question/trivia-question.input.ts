@@ -5,7 +5,7 @@ import { NodeRef } from '../../node/node.interface'
 @InputType()
 export class TriviaQuestionInput {
   @Field(type => ID, { nullable: true })
-  id?: string
+  id!: string | null
 
   @Field()
   question!: string
@@ -19,14 +19,14 @@ export class TriviaQuestionInput {
   @Field()
   language!: NodeRef
 
-  @Field({ nullable: true })
-  hint1?: string
+  @Field(type => String, { nullable: true })
+  hint1!: string | null
 
-  @Field({ nullable: true })
-  hint2?: string
+  @Field(type => String, { nullable: true })
+  hint2!: string | null
 
-  @Field({ nullable: true })
-  submitter?: string
+  @Field(type => String, { nullable: true })
+  submitter!: string | null
 }
 
 // const refInputMap = new Map<string, new () => any>()

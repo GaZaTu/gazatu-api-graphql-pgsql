@@ -1,8 +1,9 @@
 import { ObjectType, Field } from 'type-graphql'
+import { PartialNullable } from '../../PartialNullable'
 
 @ObjectType()
 export class TriviaCounts {
-  constructor(init?: Partial<TriviaCounts>) {
+  constructor(init?: PartialNullable<TriviaCounts>) {
     Object.assign(this, init)
   }
 

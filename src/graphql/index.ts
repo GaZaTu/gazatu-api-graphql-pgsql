@@ -5,6 +5,7 @@ import nodeResolvers from './node'
 import metaResolvers from './meta'
 import userResolvers from './user'
 import triviaResolvers from './trivia'
+import blogResolvers from './blog'
 import checkAuthorization from './check-authorization'
 import gqlToTs from './gqlToTs'
 import pubsub from './pubsub'
@@ -17,7 +18,8 @@ async function buildGraphQLSchema() {
       ...metaResolvers,
       ...userResolvers,
       ...triviaResolvers,
-    ],
+      ...blogResolvers,
+    ] as any,
     // resolvers: ['./dist/**/*.resolver.js'],
     container: Container,
     authMode: 'null',

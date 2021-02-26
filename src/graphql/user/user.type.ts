@@ -5,12 +5,13 @@ import { UserRole } from './role/user-role.type'
 import { toGlobalId } from 'graphql-relay'
 import * as uuid from 'uuid'
 import { OptOutOfChangeLogging } from '../meta/change/change.subscriber'
+import { PartialNullable } from '../PartialNullable'
 
 @OptOutOfChangeLogging()
 @Entity()
 @ObjectType({ implements: [Node] })
 export class User implements Node {
-  constructor(init?: Partial<User>) {
+  constructor(init?: PartialNullable<User>) {
     Object.assign(this, init)
   }
 
@@ -42,7 +43,7 @@ export class User implements Node {
 
   @BeforeInsert()
   protected beforeInsert() {
-    this.id = toGlobalId(this.constructor.name, uuid())
+    this.id = toGlobalId(this.constructor.name, uuid.v4())
   }
 }
 
