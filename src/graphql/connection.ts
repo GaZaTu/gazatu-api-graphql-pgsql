@@ -14,21 +14,40 @@ export class ConnectionArgs {
 
   @Field(type => Int, { nullable: true })
   last?: number
+
+  @Field(type => Int, { nullable: true })
+  skipPages?: number
 }
 
 export function parseConnectionArgs(args: ConnectionArgs) {
   let skip = undefined as number | undefined
   let take = undefined as number | undefined
-
+  
   if (args.before && args.last) {
-    skip = Math.max(cursorToOffset(args.before) - args.last, 0)
+    skip = cursorToOffset(args.before) - args.last
     take = args.last
+
+    if (args.skipPages) {
+      skip -= args.last * args.skipPages
+    }
+
+    if (skip < 0) {
+      skip = 0
+    }
   } else if (args.after && args.first) {
     skip = cursorToOffset(args.after) + 1
     take = args.first
+
+    if (args.skipPages) {
+      skip += args.first * args.skipPages
+    }
   } else if (args.first) {
     skip = 0
     take = args.first
+
+    if (args.skipPages) {
+      skip += args.first * args.skipPages
+    }
   }
 
   return { skip, take }
