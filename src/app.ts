@@ -27,6 +27,11 @@ import { router } from './rest'
 function koaGraphQLMiddleware(schema: gql.GraphQLSchema, contextValue?: (ctx: Koa.Context) => unknown): Koa.Middleware {
   return async (ctx, next) => {
     if (ctx.path === '/graphql' && ctx.method === 'POST') {
+      if (!ctx.request.body?.query) {
+        ctx.status = 404
+        return
+      }
+
       const document = gql.parse(ctx.request.body.query)
 
       if (ctx.request.body.variables) {
@@ -97,7 +102,7 @@ export class App {
 
     koa.use(cors({
       origin: '*',
-      allowHeaders: ['Content-Type', 'Authorization'],
+      allowHeaders: ['Authorization', 'Content-Type', 'Content-Length'],
     }))
 
     koa.use(jsonError({
