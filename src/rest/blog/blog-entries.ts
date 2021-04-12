@@ -3,6 +3,7 @@ import { getManager } from 'typeorm'
 import { BlogEntry } from '../../graphql/blog/entry/blog-entry.type'
 import { assertUserAuthorization } from '../../graphql/check-authorization'
 import { UserRoles } from '../../graphql/user/role/user-role.type'
+import * as sharp from 'sharp'
 
 export const router = new Router()
 
@@ -11,7 +12,26 @@ router.get('/blog/entries/:id/image.:ext', async ctx => {
 
   if (blogEntry && blogEntry.imageMimeType) {
     ctx.type = blogEntry.imageMimeType
-    ctx.body = blogEntry.imageAsReadStream
+    
+    const { width, height } = ctx.query
+    if (width || height) {
+      const options = {
+        width: width ? Number(width) : undefined,
+        height: height ? Number(height) : undefined,
+      }
+      
+      if (options.width && options.width > 1080) {
+        throw new Error('width > 1080')
+      }
+      
+      if (options.height && options.height > 1920) {
+        throw new Error('height > 1920')
+      }
+      
+      ctx.body = blogEntry.imageAsReadStream.pipe(sharp().resize(options))
+    } else {
+      ctx.body = blogEntry.imageAsReadStream
+    }
   } else {
     ctx.body = undefined
   }
