@@ -19,7 +19,7 @@ export const TriviaQuestionEdge = EdgeOf(TriviaQuestion)
 
 @Resolver(type => TriviaQuestion)
 export class TriviaQuestionResolver {
-  @Query(returns => TriviaQuestion, { nullable: true })
+  @Query(returns => TriviaQuestion, { nullable: true, complexity: 5 })
   async triviaQuestion(
     @Arg('id', type => ID) id: string,
   ) {

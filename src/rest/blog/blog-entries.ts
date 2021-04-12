@@ -12,23 +12,23 @@ router.get('/blog/entries/:id/image.:ext', async ctx => {
 
   if (blogEntry && blogEntry.imageMimeType) {
     ctx.type = blogEntry.imageMimeType
-    
+
     const { width, height } = ctx.query
     if (width || height) {
       const options = {
         width: width ? Number(width) : undefined,
         height: height ? Number(height) : undefined,
+      } as const
+
+      if (options.width && options.width > 1920) {
+        throw new Error('width > 1920')
       }
-      
-      if (options.width && options.width > 1080) {
-        throw new Error('width > 1080')
-      }
-      
+
       if (options.height && options.height > 1920) {
         throw new Error('height > 1920')
       }
-      
-      ctx.body = blogEntry.imageAsReadStream.pipe(sharp().resize(options))
+
+      ctx.body = blogEntry.imageAsReadStream.pipe(sharp().resize(options).withMetadata())
     } else {
       ctx.body = blogEntry.imageAsReadStream
     }

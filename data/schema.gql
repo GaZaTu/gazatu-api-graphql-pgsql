@@ -115,7 +115,7 @@ type PageInfo {
 
 type Query {
   authenticate(password: String!, username: String!): AuthResult!
-  blogEntries(createdAt: DateTime, story: String): [BlogEntry!]!
+  blogEntries(after: DateTime, before: DateTime, createdAt: DateTime, story: String): [BlogEntry!]!
   blogEntry(id: ID!): BlogEntry
   changes: [Change!]!
   currentUser: User
@@ -125,7 +125,7 @@ type Query {
   triviaCategory(id: ID!): TriviaCategory
   triviaCounts: TriviaCounts!
   triviaQuestion(id: ID!): TriviaQuestion
-  triviaQuestions(after: String, before: String, dangling: Boolean, disabled: Boolean, first: Int, last: Int, reported: Boolean, search: String, sortDirection: SortDirection = ASC, sortField: String, verified: Boolean): TriviaQuestionConnection!
+  triviaQuestions(after: String, before: String, dangling: Boolean, disabled: Boolean, first: Int, last: Int, reported: Boolean, search: String, skipPages: Int, sortDirection: SortDirection = ASC, sortField: String, verified: Boolean): TriviaQuestionConnection!
   triviaReport(id: ID!): TriviaReport
   triviaReports: [TriviaReport!]!
   user(id: ID!): User

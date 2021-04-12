@@ -19,6 +19,8 @@ export class BlogEntryResolver {
   async blogEntries(
     @Arg('story', type => String, { nullable: true }) story: string | null,
     @Arg('createdAt', type => Date, { nullable: true }) createdAt: Date | null,
+    @Arg('before', type => Date, { nullable: true }) before: Date | null,
+    @Arg('after', type => Date, { nullable: true }) after: Date | null,
   ) {
     let query = getRepository(BlogEntry)
       .createQueryBuilder('entry')
@@ -34,6 +36,16 @@ export class BlogEntryResolver {
     if (createdAt) {
       query = query
         .andWhere('entry."createdAt" = :createdAt', { createdAt })
+    }
+
+    if (before) {
+      query = query
+        .andWhere('entry."createdAt" < :before', { before })
+    }
+
+    if (after) {
+      query = query
+        .andWhere('entry."createdAt" > :after', { after })
     }
 
     return query.getMany()
