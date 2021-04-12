@@ -33,7 +33,7 @@ router.get('/blog/entries/:id/image.:ext', async ctx => {
       ctx.body = blogEntry.imageAsReadStream
     }
   } else {
-    ctx.body = undefined
+    ctx.status = 404
   }
 })
 
@@ -55,5 +55,5 @@ router.post('/blog/entries/:id/image.:ext', async ctx => {
     await getManager().save(BlogEntry, blogEntry)
   }
 
-  ctx.body = undefined
+  ctx.status = 204
 })
