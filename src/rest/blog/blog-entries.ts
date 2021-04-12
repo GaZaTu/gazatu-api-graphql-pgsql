@@ -12,26 +12,27 @@ router.get('/blog/entries/:id/image.:ext', async ctx => {
 
   if (blogEntry && blogEntry.imageMimeType) {
     ctx.type = blogEntry.imageMimeType
+    ctx.body = blogEntry.imageAsReadStream
+  } else {
+    ctx.status = 404
+  }
+})
 
-    const { width, height } = ctx.query
-    if (width || height) {
-      const options = {
-        width: width ? Number(width) : undefined,
-        height: height ? Number(height) : undefined,
-      } as const
+router.get('/blog/entries/:id/preview.:ext', async ctx => {
+  const blogEntry = await getManager().findOne(BlogEntry, ctx.params.id)
 
-      if (options.width && options.width > 1920) {
-        throw new Error('width > 1920')
-      }
-
-      if (options.height && options.height > 1920) {
-        throw new Error('height > 1920')
-      }
-
-      ctx.body = blogEntry.imageAsReadStream.pipe(sharp().resize(options).withMetadata())
-    } else {
-      ctx.body = blogEntry.imageAsReadStream
+  if (blogEntry && blogEntry.imageMimeType) {
+    if (!blogEntry.previewExists) {
+      await new Promise(resolve => {
+        blogEntry.imageAsReadStream
+          .pipe(sharp().resize({ width: 128, height: 128 }).withMetadata())
+          .pipe(blogEntry.previewAsWriteStream)
+          .on('close', resolve)
+      })
     }
+
+    ctx.type = blogEntry.imageMimeType
+    ctx.body = blogEntry.previewAsReadStream
   } else {
     ctx.status = 404
   }

@@ -35,14 +35,18 @@ export class BlogEntry implements Node {
   // @Column({ type: 'bytea',  nullable: true })
   // image!: Buffer | null
 
-  private get imageFSPath() {
-    const imagesDir = `${__dirname}/../../../../data/files`
+  get imageFSPath() {
+    const imagesDir = `${__dirname}/../../../../data/files/blog/images`
 
     if (!fs.existsSync(imagesDir)) {
       fs.mkdirSync(imagesDir)
     }
 
     return `${imagesDir}/${this.id}`
+  }
+
+  get imageExists() {
+    return fs.existsSync(this.imageFSPath)
   }
 
   get image() {
@@ -60,6 +64,37 @@ export class BlogEntry implements Node {
 
   get imageAsWriteStream() {
     return fs.createWriteStream(this.imageFSPath)
+  }
+
+  get previewFSPath() {
+    const previewsDir = `${__dirname}/../../../../data/files/blog/previews`
+
+    if (!fs.existsSync(previewsDir)) {
+      fs.mkdirSync(previewsDir)
+    }
+
+    return `${previewsDir}/${this.id}`
+  }
+
+  get previewExists() {
+    return fs.existsSync(this.previewFSPath)
+  }
+
+  get preview() {
+    return fs.promises.readFile(this.previewFSPath)
+  }
+
+  set preview(v: Buffer | Promise<Buffer>) {
+    this.promises ??= []
+    this.promises.push(Promise.resolve(v).then(v => fs.promises.writeFile(this.previewFSPath, v)))
+  }
+
+  get previewAsReadStream() {
+    return fs.createReadStream(this.previewFSPath)
+  }
+
+  get previewAsWriteStream() {
+    return fs.createWriteStream(this.previewFSPath)
   }
 
   @Field(type => String, { nullable: true, complexity: 5 })
