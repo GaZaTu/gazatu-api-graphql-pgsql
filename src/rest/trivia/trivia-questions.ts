@@ -1,9 +1,10 @@
 import * as Router from '@koa/router'
-import { getRepository } from 'typeorm'
+import { getManager, getRepository } from 'typeorm'
 import { Language } from '../../graphql/meta/language/language.type'
 import { TriviaCategory } from '../../graphql/trivia/category/trivia-category.type'
 import { TriviaQuestionLegacyInput } from '../../graphql/trivia/question/trivia-question.legacy.input'
 import { TriviaQuestion } from '../../graphql/trivia/question/trivia-question.type'
+import { TriviaReport } from '../../graphql/trivia/report/trivia-report.type'
 
 export const router = new Router()
 
@@ -91,4 +92,22 @@ router.get('/trivia/questions', async ctx => {
     // createdAt: q['question_createdAt'],
     // updatedAt: q['question_updatedAt'],
   } as TriviaQuestionLegacyInput))
+})
+
+router.post('/trivia/reports', async ctx => {
+  const {
+    questionId,
+    user: submitter,
+    message,
+  } = ctx.request.body
+
+  const report = new TriviaReport({
+    questionId,
+    message,
+    submitter,
+  })
+
+  await getManager().save(TriviaReport, report)
+
+  ctx.status = 204
 })
