@@ -22,6 +22,15 @@ router.get('/blog/entries/:id/preview.:ext', async ctx => {
   const blogEntry = await getManager().findOne(BlogEntry, ctx.params.id)
 
   if (blogEntry && blogEntry.imageMimeType) {
+    if (!blogEntry.imageExists) {
+      if ((new Date().getTime() - (1000 * 60 * 60 * 24)) > blogEntry.createdAt.getTime()) {
+        await getManager().remove(blogEntry)
+      }
+      
+      ctx.status = 404
+      return
+    }
+    
     if (!blogEntry.previewExists) {
       await new Promise(resolve => {
         blogEntry.imageAsReadStream
