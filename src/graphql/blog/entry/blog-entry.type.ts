@@ -39,7 +39,7 @@ export class BlogEntry implements Node {
     const imagesDir = `${__dirname}/../../../../data/files/blog/images`
 
     if (!fs.existsSync(imagesDir)) {
-      fs.mkdirSync(imagesDir)
+      fs.mkdirSync(imagesDir, { recursive: true })
     }
 
     return `${imagesDir}/${this.id}`
@@ -70,7 +70,7 @@ export class BlogEntry implements Node {
     const previewsDir = `${__dirname}/../../../../data/files/blog/previews`
 
     if (!fs.existsSync(previewsDir)) {
-      fs.mkdirSync(previewsDir)
+      fs.mkdirSync(previewsDir, { recursive: true })
     }
 
     return `${previewsDir}/${this.id}`
