@@ -14,12 +14,12 @@ export const OptOutOfChangeLogging = (): ClassDecorator => {
 @EventSubscriber()
 export class ChangeSubscriber implements EntitySubscriberInterface {
   static clearChangesIntervalId = setInterval(async () => {
-    const today1WeekAgo = new Date()
-    today1WeekAgo.setDate(today1WeekAgo.getDate() - 7)
+    const today1MonthAgo = new Date()
+    today1MonthAgo.setDate(today1MonthAgo.getDate() - 30)
 
     const oldChanges = await getManager().find(Change, {
       where: {
-        createdAt: LessThan(today1WeekAgo),
+        createdAt: LessThan(today1MonthAgo),
       },
     })
 
