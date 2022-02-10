@@ -80,6 +80,7 @@ const numberAlwaysSignedFormat = new Intl.NumberFormat('en-US', {
 router.get('/stuff/aoe4rank', async ctx => {
   const aoe4rankResult = await fetchAoE4Rank({
     searchPlayer: String(ctx.query.q ?? ''),
+    teamSize: String(ctx.query.size ?? '1v1') as AoE4TeamSize,
     count: 1,
   })
 
@@ -100,7 +101,7 @@ router.get('/stuff/aoe4rank', async ctx => {
           winStreak,
         } = aoe4rank
 
-        ctx.body = `${userName} (${elo}) Rank #${numberSignedFormat.format(rank)}, has played ${losses + wins} games with a ${winPercent}% winrate, and a ${numberAlwaysSignedFormat.format(winStreak)} streak `
+        ctx.body = `${userName} (${elo}) Rank #${numberSignedFormat.format(rank)}, has played ${losses + wins} games with a ${winPercent}% winrate, and a ${numberAlwaysSignedFormat.format(winStreak)} streak`
       } else {
         ctx.body = `Player not found`
       }
