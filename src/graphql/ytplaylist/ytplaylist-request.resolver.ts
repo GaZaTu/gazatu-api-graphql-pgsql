@@ -5,6 +5,51 @@ import { YTPlaylistRequestInput } from './ytplaylist-request.input'
 import * as config from 'config'
 import { CountResult } from '../count.result'
 import { ExportableUser } from '../user/user.type'
+import * as fetch from 'node-fetch'
+
+type NoEmbedResponse = {
+  'error': undefined
+  'author_name': string
+  'title': string
+  'html': string
+} | {
+  'error': string
+}
+
+const resolveYTVideo = async (url: string) => {
+  if (!url) {
+    return undefined
+  }
+
+  if (url.startsWith('/watch')) {
+    url = `https://youtube.com${url}`
+  }
+
+  if (!url.startsWith('http')) {
+    url = `https://youtube.com/watch?v=${url}`
+  }
+
+  const noembedUrl = `https://noembed.com/embed?url=${url}`
+  const response = await fetch(noembedUrl)
+    .then(r => r.json()) as NoEmbedResponse
+
+  if (response.error !== undefined) {
+    return undefined
+  }
+
+  const regex = /https:\/\/www\.youtube\.com\/embed\/([^?]+)/
+  const match = regex.exec(response.html)
+
+  if (!match) {
+    return undefined
+  }
+
+  return {
+    ytID: match[1],
+    channel: response.author_name,
+    title: response.title,
+  }
+}
 
 @Resolver(type => YTPlaylistRequest)
 export class YTPlaylistRequestResolver {
@@ -12,7 +57,7 @@ export class YTPlaylistRequestResolver {
   async submitYTPlaylistRequest(
     @Arg('input') input: YTPlaylistRequestInput,
   ) {
-    const { id, authorization, ...requestInput } = input
+    const { id, ytUrlOrID, authorization, ...requestInput } = input
 
     // localhost only
     if (authorization != config.get('jwtSecret')) {
@@ -22,6 +67,7 @@ export class YTPlaylistRequestResolver {
     const request = new YTPlaylistRequest({
       id: id ?? undefined,
       ...requestInput,
+      ...(await resolveYTVideo(ytUrlOrID)),
       verified: true,
     })
 

@@ -33,7 +33,11 @@ export class YTPlaylistRequest implements Node {
 
   @Column({ type: String, nullable: true })
   @Field(type => String, { nullable: true })
-  submitter!: string | null
+  channel!: string | null
+
+  @Column({ type: String, nullable: true })
+  @Field(type => String, { nullable: true })
+  requestedBy!: string | null
 
   @Column({ default: false })
   @Field({ defaultValue: false })

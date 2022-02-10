@@ -9,13 +9,10 @@ export class YTPlaylistRequestInput {
   forUserId!: string
 
   @Field()
-  ytID!: string
+  ytUrlOrID!: string
 
   @Field(type => String, { nullable: true })
-  title!: string | null
-
-  @Field(type => String, { nullable: true })
-  submitter!: string | null
+  requestedBy!: string | null
 
   @Field(type => String)
   authorization!: string
