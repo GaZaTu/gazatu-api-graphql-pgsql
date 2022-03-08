@@ -6,7 +6,7 @@ export const aoe4Regions = {
   'global': '7',
 } as const
 
-export type AoE4MatchType = 'unranked'
+export type AoE4MatchType = 'unranked' | 'ranked'
 export type AoE4Region = (typeof aoe4Regions)[keyof (typeof aoe4Regions)]
 export type AoE4TeamSize = '1v1' | '2v2' | '3v3' | '4v4'
 export type AoE4Versus = 'players'
@@ -81,6 +81,7 @@ router.get('/stuff/aoe4rank', async ctx => {
   const aoe4rankResult = await fetchAoE4Rank({
     searchPlayer: String(ctx.query.q ?? ''),
     teamSize: String(ctx.query.size ?? '1v1') as AoE4TeamSize,
+    matchType: String(ctx.query.type ?? 'unranked') as AoE4MatchType,
     count: 1,
   })
 
