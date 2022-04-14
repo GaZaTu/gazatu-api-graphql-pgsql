@@ -31,6 +31,8 @@ export type AoE4LeaderboardResponse = {
     losses: number
     playerNumber: unknown
     rank: number
+    rankIcon: string
+    rankLevel: string
     region: '0'
     rlUserId: number
     userId: string
@@ -62,7 +64,6 @@ export const fetchAoE4Rank = async (request: Partial<AoE4LeaderboardRequest> = {
   })
 
   const data = await response.json() as AoE4LeaderboardResponse
-
   return data
 }
 
@@ -96,13 +97,14 @@ router.get('/stuff/aoe4rank', async ctx => {
           userName,
           elo,
           rank,
+          rankLevel,
           losses,
           wins,
           winPercent,
           winStreak,
         } = aoe4rank
 
-        ctx.body = `${userName} (${elo}) Rank #${numberSignedFormat.format(rank)}, has played ${losses + wins} games with a ${winPercent}% winrate, and a ${numberAlwaysSignedFormat.format(winStreak)} streak`
+        ctx.body = `${userName} (Elo: ${elo}, ${rankLevel}) Rank #${numberSignedFormat.format(rank)}, has played ${losses + wins} games with a ${winPercent}% winrate, and a ${numberAlwaysSignedFormat.format(winStreak)} streak`
       } else {
         ctx.body = `Player not found`
       }
