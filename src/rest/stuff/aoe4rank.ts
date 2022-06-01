@@ -3,10 +3,10 @@ import * as fetch from 'node-fetch'
 
 export const aoe4Regions = {
   // 'unknown': '0',
-  'global': '7',
+  'global': 7,
 } as const
 
-export type AoE4MatchType = 'unranked' | 'ranked'
+export type AoE4MatchType = 'unranked' | '1'
 export type AoE4Region = (typeof aoe4Regions)[keyof (typeof aoe4Regions)]
 export type AoE4TeamSize = '1v1' | '2v2' | '3v3' | '4v4'
 export type AoE4Versus = 'players'
@@ -44,10 +44,12 @@ export type AoE4LeaderboardResponse = {
 }
 
 export const fetchAoE4Rank = async (request: Partial<AoE4LeaderboardRequest> = {}) => {
-  const API_URL = 'https://api.ageofempires.com/api/ageiv/Leaderboard'
+  const API_URL_UNRANKED = 'https://api.ageofempires.com/api/ageiv/Leaderboard'
+  const API_URL_RANKED = 'https://api.ageofempires.com/api/ageiv/EventLeaderboard'
+  
   const defaults: AoE4LeaderboardRequest = {
     count: 25,
-    matchType: 'unranked',
+    matchType: (request.matchType === 'ranked') ? '1' : 'unranked',
     page: 1,
     region: aoe4Regions.global,
     searchPlayer: '',
@@ -55,13 +57,21 @@ export const fetchAoE4Rank = async (request: Partial<AoE4LeaderboardRequest> = {
     versus: 'players',
   }
 
-  const response = await fetch(API_URL, {
+  const url = (request.matchType === 'ranked') ? API_URL_RANKED : API_URL_UNRANKED
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
     body: JSON.stringify({ ...defaults, ...request }),
   })
+  
+  if (response.ok && response.status !== 200) {
+    return {
+      count: 0,
+      items: [],
+    }
+  }
 
   const data = await response.json() as AoE4LeaderboardResponse
   return data
