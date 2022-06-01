@@ -19,6 +19,7 @@ export type AoE4LeaderboardRequest = {
   searchPlayer: string
   teamSize: AoE4TeamSize
   versus: AoE4Versus
+  ranked?: boolean
 }
 
 export type AoE4LeaderboardResponse = {
@@ -49,7 +50,7 @@ export const fetchAoE4Rank = async (request: Partial<AoE4LeaderboardRequest> = {
   
   const defaults: AoE4LeaderboardRequest = {
     count: 25,
-    matchType: (request.matchType === 'ranked') ? '1' : 'unranked',
+    matchType: request.ranked ? '1' : 'unranked',
     page: 1,
     region: aoe4Regions.global,
     searchPlayer: '',
@@ -57,7 +58,7 @@ export const fetchAoE4Rank = async (request: Partial<AoE4LeaderboardRequest> = {
     versus: 'players',
   }
 
-  const url = (request.matchType === 'ranked') ? API_URL_RANKED : API_URL_UNRANKED
+  const url = request.ranked ? API_URL_RANKED : API_URL_UNRANKED
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -92,7 +93,7 @@ router.get('/stuff/aoe4rank', async ctx => {
   const aoe4rankResult = await fetchAoE4Rank({
     searchPlayer: String(ctx.query.q ?? ''),
     teamSize: String(ctx.query.size ?? '1v1') as AoE4TeamSize,
-    matchType: String(ctx.query.type ?? 'unranked') as AoE4MatchType,
+    ranked: Boolean(ctx.query.ranked ?? 'false'),
     count: 1,
   })
 
