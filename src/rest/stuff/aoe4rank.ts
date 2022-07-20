@@ -6,7 +6,7 @@ export const aoe4Regions = {
   'global': 7,
 } as const
 
-export type AoE4MatchType = 'unranked' | '1'
+export type AoE4MatchType = string | number
 export type AoE4Region = (typeof aoe4Regions)[keyof (typeof aoe4Regions)]
 export type AoE4TeamSize = '1v1' | '2v2' | '3v3' | '4v4'
 export type AoE4Versus = 'players'
@@ -50,7 +50,7 @@ export const fetchAoE4Rank = async (request: Partial<AoE4LeaderboardRequest> = {
   
   const defaults: AoE4LeaderboardRequest = {
     count: 25,
-    matchType: request.ranked ? '1' : 'unranked',
+    matchType: request.ranked ? 2 : 'unranked',
     page: 1,
     region: aoe4Regions.global,
     searchPlayer: '',
